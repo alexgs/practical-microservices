@@ -1,0 +1,46 @@
+version: '3'
+
+vars:
+  DATABASE_INIT_NAME: postgres-init-container
+  DATABASE_SERVICE_NAME: database
+
+tasks:
+  psql:
+    cmds:
+      - "psql -h localhost -p $DATABASE_PORT -U $DATABASE_USER -d $DATABASE_NAME"
+    desc: Connect to the Postgres cluster with the `psql` tool
+
+  shell:
+    cmds:
+      - docker exec -it database /bin/sh
+    desc: Open a shell in the {{.DATABASE_SERVICE_NAME|title}} container
+
+  # - HIDDEN & DANGEROUS COMMANDS -
+
+  # Initialize the __host__ Postgres data directory
+  DANGEROUS:initialize:
+    cmds:
+      - task: initialize-0-make-directory
+      - task: initialize-1-start-container
+      - task: initialize-2-sleep
+      - task: initialize-3-stop-container
+      - echo "Initialization complete."
+
+  # Erase the __host__ Postgres data directory with extreme prejudice
+  DANGEROUS:wipe-host-data:
+    cmds:
+      - sudo rm -rf $DATABASE_HOST_DIRECTORY
+
+  # --- PRIVATE COMMANDS ---
+
+  private:initialize-0-make-directory: mkdir -p $DATABASE_HOST_DIRECTORY
+  private:initialize-1-start-container: docker run --rm --name {{.DATABASE_INIT_NAME}} -d -p 5432:5432
+    -e POSTGRES_DB=$DATABASE_NAME
+    -e POSTGRES_HOST_AUTH_METHOD=scram-sha-256
+    -e POSTGRES_INITDB_ARGS="--auth=scram-sha-256"
+    -e POSTGRES_PASSWORD=$DATABASE_PASSWORD
+    -e POSTGRES_USER=$DATABASE_USER
+    -v $DATABASE_HOST_DIRECTORY:/var/lib/postgresql/data
+    postgres:13-alpine
+  private:initialize-2-sleep: sleep 15s
+  private:initialize-3-stop-container: docker stop {{.DATABASE_INIT_NAME}}

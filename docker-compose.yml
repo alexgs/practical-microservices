@@ -1,0 +1,47 @@
+services:
+  database:
+    image: postgres:13-alpine
+    container_name: database
+    restart: unless-stopped
+    ports:
+      - "${DATABASE_PORT}:5432"
+    volumes:
+      - "${DATABASE_HOST_DIRECTORY}:/var/lib/postgresql/data"
+      - ./host/database:/host
+    working_dir: /host
+    networks:
+      - app-network
+
+  server:
+    image: alexgs99/node:2
+    container_name: server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - .:/home/node/winterfell
+    working_dir: /home/node/winterfell/server
+    networks:
+      - app-network
+    environment:
+      - DATABASE_URL
+    command: npm run dev
+
+#  webapp:
+#    image: alexgs99/node:2
+#    container_name: webapp
+#    restart: unless-stopped
+#    ports:
+#      - "3001:3000"
+#    volumes:
+#      - .:/home/node/winterfell
+#    working_dir: /home/node/winterfell/webapp
+#    networks:
+#      - app-network
+#    command: npm run dev
+
+networks:
+  app-network:
+    driver: bridge
+    name: electric-net

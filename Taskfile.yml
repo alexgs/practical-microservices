@@ -1,0 +1,29 @@
+version: '3'
+
+includes:
+  db: ./taskfiles/database.yml
+
+dotenv: ['.env']
+
+vars:
+  COMPOSE: docker-compose
+  NPM_EXEC_PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games'
+
+  NPM: "PATH={{.NPM_EXEC_PATH}} npm"
+
+
+tasks:
+  config:
+    cmds:
+      - "{{.COMPOSE}} config"
+    desc: Print the compose file with variables expanded
+
+  down:
+    cmds:
+      - "{{.COMPOSE}} down --remove-orphans"
+    desc: Tear down the application
+
+  up:
+    cmds:
+      - "{{.COMPOSE}} up -d"
+    desc: Spin-up the application
