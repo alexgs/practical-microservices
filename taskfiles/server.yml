@@ -1,0 +1,38 @@
+version: '3'
+
+vars:
+  SERVER_SERVICE_NAME: server
+  SERVER_WORKING_DIR: ./server
+
+  SERVER_VERSION:
+    sh: jq -r .version {{.SERVER_WORKING_DIR}}/package.json
+
+tasks:
+  node:
+    cmds:
+      - docker exec -it {{.SERVER_SERVICE_NAME}} zsh
+    desc: Open a shell for running node & npm commands in the {{.SERVER_SERVICE_NAME|title}} container
+
+  version:major:
+    cmds:
+      - "{{.NPM}} version major"
+    desc: Increment major version number
+
+  version:minor:
+    cmds:
+      - "{{.NPM}} version minor"
+    desc: Increment minor version number
+
+  version:patch:
+    cmds:
+      - "{{.NPM}} version patch"
+    desc: Increment patch version number
+
+  # --- HIDDEN COMMANDS ---
+
+  show-version:
+    cmds:
+      - echo {{.SERVER_VERSION}}
+    silent: true
+
+  # --- PRIVATE COMMANDS ---

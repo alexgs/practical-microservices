@@ -2,6 +2,7 @@ version: '3'
 
 includes:
   db: ./taskfiles/database.yml
+  srv: ./taskfiles/server.yml
 
 dotenv: ['.env']
 

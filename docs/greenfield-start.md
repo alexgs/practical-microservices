@@ -14,5 +14,12 @@ Here I'm going to keep track of all the things I do to set this project up. Fasc
 1. Initialize database.
 1. Spin up Docker Compose stack and verify that server is working.
 1. **Commit.**
+1. Add task-file from Server service.
+1. Copy ESLint and Prettier configs from previous projects and adapt for this one.
 
 [1]: https://github.com/tsconfig/bases
+
+## Other resources
+
+- https://github.com/microsoft/TypeScript-Node-Starter
+- https://github.com/jsynowiec/node-typescript-boilerplate
