@@ -30,3 +30,5 @@ logs/**/*.log
 *.pem
 *.pgsql
 *.tar.gz
+
+server/temp

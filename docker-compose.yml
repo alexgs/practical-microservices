@@ -17,7 +17,7 @@ services:
     container_name: server
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${SERVER_PORT}:3000"
       - "5555:5555"
     volumes:
       - .:/home/node/winterfell
@@ -26,6 +26,7 @@ services:
       - app-network
     environment:
       - DATABASE_URL
+      - SERVER_PORT
     command: npm run dev
 
 #  webapp:
@@ -33,15 +34,17 @@ services:
 #    container_name: webapp
 #    restart: unless-stopped
 #    ports:
-#      - "3001:3000"
+#      - "${WEBAPP_PORT}:3000"
 #    volumes:
 #      - .:/home/node/winterfell
 #    working_dir: /home/node/winterfell/webapp
 #    networks:
 #      - app-network
+#    environment:
+#      - WEBAPP_PORT
 #    command: npm run dev
 
 networks:
   app-network:
     driver: bridge
-    name: electric-net
+    name: winterfell-net

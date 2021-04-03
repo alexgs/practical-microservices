@@ -20,10 +20,10 @@ tasks:
   # Initialize the __host__ Postgres data directory
   DANGEROUS:initialize:
     cmds:
-      - task: initialize-0-make-directory
-      - task: initialize-1-start-container
-      - task: initialize-2-sleep
-      - task: initialize-3-stop-container
+      - task: private:initialize-0-make-directory
+      - task: private:initialize-1-start-container
+      - task: private:initialize-2-sleep
+      - task: private:initialize-3-stop-container
       - echo "Initialization complete."
 
   # Erase the __host__ Postgres data directory with extreme prejudice
