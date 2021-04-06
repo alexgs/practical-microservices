@@ -3,10 +3,24 @@ import * as env from 'env-var';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
+const plugin: Hapi.Plugin<null> = {
+  name: 'first-plugin',
+  // eslint-disable-next-line @typescript-eslint/require-await
+  register: async (server, options) => {
+    server.ext('onRequest', function(request, h){
+      console.log('>> Inside onRequest <<');
+      return h.continue;
+    })
+
+  },
+}
+
 const main = async () => {
   const server = Hapi.server({
     port: PORT,
   });
+
+  await server.register(plugin);
 
   server.route({
     method: 'GET',
