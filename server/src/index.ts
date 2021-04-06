@@ -1,19 +1,29 @@
 import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
+import { v4 as getUuid } from 'uuid';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
+
+interface WinterfellAppState extends Hapi.RequestApplicationState {
+  traceId?: string;
+}
+
+interface WinterfellRequest extends Hapi.Request {
+  app: WinterfellAppState;
+}
 
 const plugin: Hapi.Plugin<null> = {
   name: 'first-plugin',
   // eslint-disable-next-line @typescript-eslint/require-await
-  register: async (server, options) => {
-    server.ext('onRequest', function(request, h){
-      console.log('>> Inside onRequest <<');
+  register: async (server) => {
+    server.ext('onRequest', function (request: WinterfellRequest, h) {
+      const traceId = getUuid();
+      console.log(`>> Starting request with trace ID ${traceId} <<`);
+      request.app.traceId = traceId;
       return h.continue;
-    })
-
+    });
   },
-}
+};
 
 const main = async () => {
   const server = Hapi.server({
@@ -27,7 +37,7 @@ const main = async () => {
     path: '/',
     handler: (request, h) => {
       return 'Hello Winterfell!';
-    }
+    },
   });
 
   // First application. Eventually, it will probably be a good idea to de-couple
@@ -36,10 +46,10 @@ const main = async () => {
   server.route({
     method: 'GET',
     path: '/api/videos',
-    handler: (request, h) => {
+    handler: (request: WinterfellRequest, h) => {
       return {
         message: 'Hello videos',
-        traceId: request.traceId,
+        traceId: request.app.traceId,
       };
     },
   });
