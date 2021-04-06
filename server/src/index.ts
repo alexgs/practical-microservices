@@ -16,6 +16,20 @@ const main = async () => {
     }
   });
 
+  // First application. Eventually, it will probably be a good idea to de-couple
+  //   creating the routes and the handlers and connecting them to the Hapi
+  //   server, but I'm not doing that in the beginning.
+  server.route({
+    method: 'GET',
+    path: '/api/videos',
+    handler: (request, h) => {
+      return {
+        message: 'Hello videos',
+        traceId: request.traceId,
+      };
+    },
+  });
+
   await server.start();
   return server;
 };
