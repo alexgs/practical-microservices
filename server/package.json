@@ -19,6 +19,7 @@
     "lint": "eslint .",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
+    "seed": "prisma db seed --preview-feature",
     "studio": "prisma studio"
   },
   "dependencies": {
