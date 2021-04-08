@@ -2,6 +2,8 @@ import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
 import { v4 as getUuid } from 'uuid';
 
+import { prisma } from '../lib';
+
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
 interface WinterfellAppState extends Hapi.RequestApplicationState {
@@ -12,6 +14,8 @@ interface WinterfellRequest extends Hapi.Request {
   app: WinterfellAppState;
 }
 
+// TODO Would it be better to use [server.bind][1]?
+//   [1]: https://hapi.dev/api/?v=20.1.2#server.bind()
 const plugin: Hapi.Plugin<null> = {
   name: 'first-plugin',
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -35,7 +39,7 @@ const main = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
+    handler: () => {
       return 'Hello Winterfell!';
     },
   });
@@ -46,11 +50,14 @@ const main = async () => {
   server.route({
     method: 'GET',
     path: '/api/videos',
-    handler: (request: WinterfellRequest, h) => {
-      return {
-        message: 'Hello videos',
-        traceId: request.app.traceId,
-      };
+    handler: async (request: WinterfellRequest, h) => {
+      const data = await prisma.video.findMany({
+        orderBy: { id: 'asc' },
+        take: 5,
+      });
+      return h
+        .response({ data })
+        .header('X-Trace-ID', request.app.traceId ?? 'missing-trace-id-0000');
     },
   });
 
