@@ -2,7 +2,7 @@ import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
 import { v4 as getUuid } from 'uuid';
 
-import { prisma } from '../lib';
+import { createMessageStore, db } from '../lib';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
@@ -13,6 +13,8 @@ interface WinterfellAppState extends Hapi.RequestApplicationState {
 interface WinterfellRequest extends Hapi.Request {
   app: WinterfellAppState;
 }
+
+const messageStore = createMessageStore(db);
 
 // TODO Would it be better to use [server.bind][1]?
 //   [1]: https://hapi.dev/api/?v=20.1.2#server.bind()
@@ -51,7 +53,7 @@ const main = async () => {
     method: 'GET',
     path: '/api/videos',
     handler: async (request: WinterfellRequest, h) => {
-      const data = await prisma.video.findMany({
+      const data = await db.video.findMany({
         orderBy: { id: 'asc' },
         take: 5,
       });
@@ -65,6 +67,7 @@ const main = async () => {
     method: 'POST',
     path: '/api/videos/{videoId}/record-view',
     handler: (request: WinterfellRequest) => {
+      const traceId = request.app.traceId ?? 'missing-trace-id-0001';
       const userId = 2; // TODO Change this after we actually have user registration
       const videoId = request.params.videoId as string;
 
@@ -72,8 +75,8 @@ const main = async () => {
         id: getUuid(),
         type: 'VideoViewed', // TODO Standardize these with a global constant
         metadata: {
+          traceId,
           userId,
-          traceId: request.app.traceId,
         },
         data: {
           userId,
@@ -81,7 +84,7 @@ const main = async () => {
         },
       };
       const streamName = `viewing-${videoId}`;
-      messageStore.write(streamName, event); // TODO
+      messageStore.write(streamName, event);
 
       return { videoId }; // TODO What's an appropriate response payload
     },

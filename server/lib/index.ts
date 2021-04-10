@@ -1,1 +1,2 @@
-export { prisma } from './prisma';
+export { DbClient, db } from './database-client';
+export * from './message-store';
