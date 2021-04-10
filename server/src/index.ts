@@ -61,6 +61,32 @@ const main = async () => {
     },
   });
 
+  server.route({
+    method: 'POST',
+    path: '/api/videos/{videoId}/record-view',
+    handler: (request: WinterfellRequest) => {
+      const userId = 2; // TODO Change this after we actually have user registration
+      const videoId = request.params.videoId as string;
+
+      const event = {
+        id: getUuid(),
+        type: 'VideoViewed', // TODO Standardize these with a global constant
+        metadata: {
+          userId,
+          traceId: request.app.traceId,
+        },
+        data: {
+          userId,
+          videoId,
+        },
+      };
+      const streamName = `viewing-${videoId}`;
+      messageStore.write(streamName, event); // TODO
+
+      return { videoId }; // TODO What's an appropriate response payload
+    },
+  });
+
   await server.start();
   return server;
 };
