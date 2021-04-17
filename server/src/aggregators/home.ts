@@ -5,21 +5,7 @@
 import { DbClient } from '../../lib';
 import { MessageStore, WinterfellEvent } from '../message-store';
 
-export const PAGE = {
-  HOME: 'home',
-};
-
-export interface Startable {
-  start: () => Promise<void>;
-}
-
-interface Aggregator extends Startable {
-  /* eslint-disable @typescript-eslint/ban-types */
-  handlers: Record<string, Function>;
-  init: () => void;
-  queries: Record<string, Function>;
-  /* eslint-enable @typescript-eslint/ban-types */
-}
+import { PAGE, Aggregator } from './index';
 
 function createMessageHandlers(queries: ReturnType<typeof createQueries>) {
   // TODO Ideally, keys here would be limited in Typescript to defined message types

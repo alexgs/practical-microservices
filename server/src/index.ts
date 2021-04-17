@@ -9,10 +9,10 @@ import { v4 as getUuid } from 'uuid';
 import { db, pg } from '../lib';
 
 import {
-  createAggregator as createHomeAggregator,
   PAGE,
   Startable,
-} from './aggregators/home';
+  createHomeAggregator,
+} from './aggregators';
 import { createMessageStore } from './message-store';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
