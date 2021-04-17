@@ -2,9 +2,18 @@
  * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
  */
 
+import { QueryResult } from 'pg';
+
 import { PgClient } from '../../lib';
 
-export type WinterfellEventData = JsonB;
+import {
+  CreateSubscriptionOptions,
+  Subscription,
+  createSubscriptionFactory,
+} from './create-subscription-factory';
+import { writeFactory } from './write-factory';
+
+export type JsonB = Record<string, unknown>;
 
 export interface EventInput {
   id: string;
@@ -12,6 +21,17 @@ export interface EventInput {
   metadata: WinterfellEventMetadata;
   data: WinterfellEventData;
 }
+
+export interface MessageStore {
+  createSubscription: (options: CreateSubscriptionOptions) => Subscription;
+  write: (
+    streamName: string,
+    message: EventInput,
+    expectedVersion?: number | null,
+  ) => Promise<QueryResult>;
+}
+
+export type WinterfellEventData = JsonB;
 
 export interface WinterfellEvent extends EventInput {
   global_position: number;
@@ -24,51 +44,9 @@ export interface WinterfellEventMetadata extends JsonB {
   userId: number;
 }
 
-const SQL_FN = {
-  WRITE: 'SELECT write_message($1, $2, $3, $4, $5, $6)',
-};
-
-type JsonB = Record<string, unknown>;
-type WriteValues = [string, string, string, JsonB, JsonB, number | null];
-export type MessageStore = ReturnType<typeof createMessageStore>;
-
-interface CreateSubscriptionOptions {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  handlers: Record<string, Function>;
-  streamName: string;
-  subscriberId: string;
-}
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function createMessageStore(pg: PgClient) {
-  function createSubscription (options: CreateSubscriptionOptions) {
-    return {
-      start: () => {
-        console.log(
-          `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
-        );
-      },
-    };
-  }
-
-  async function write (
-    streamName: string,
-    message: EventInput,
-    expectedVersion: number | null = null,
-  ) {
-    const values: WriteValues = [
-      message.id,
-      streamName,
-      message.type,
-      message.data,
-      message.metadata,
-      expectedVersion,
-    ];
-    return pg.query(SQL_FN.WRITE, values);
-  }
-
+export function createMessageStore(pg: PgClient): MessageStore {
   return {
-    createSubscription,
-    write,
+    createSubscription: createSubscriptionFactory(),
+    write: writeFactory(pg),
   };
 }

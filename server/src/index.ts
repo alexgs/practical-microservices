@@ -9,11 +9,11 @@ import { v4 as getUuid } from 'uuid';
 import { db, pg } from '../lib';
 
 import {
-  PAGE,
-  Startable,
+  PAGES,
   createHomeAggregator,
 } from './aggregators';
 import { createMessageStore } from './message-store';
+import { Startable } from './types';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
@@ -66,7 +66,7 @@ const main = async () => {
     path: '/api/pages/home',
     handler: async (request: WinterfellRequest, h) => {
       const data = await db.pages.findFirst({
-        where: { name: PAGE.HOME },
+        where: { name: PAGES.HOME },
       });
       return h
         .response({ data })

@@ -5,7 +5,7 @@
 import { DbClient } from '../../lib';
 import { MessageStore, WinterfellEvent } from '../message-store';
 
-import { PAGE, Aggregator } from './index';
+import { PAGES, Aggregator } from './index';
 
 function createMessageHandlers(queries: ReturnType<typeof createQueries>) {
   // TODO Ideally, keys here would be limited in Typescript to defined message types
@@ -22,7 +22,7 @@ function createQueries(db: DbClient) {
       try {
         await db.pages.create({
           data: {
-            name: PAGE.HOME,
+            name: PAGES.HOME,
             data: {
               lastViewProcessed: 0,
               videosViewed: 0,
@@ -59,7 +59,7 @@ function createQueries(db: DbClient) {
             ${event.global_position}::text::jsonb
           )
         WHERE
-          name = '${PAGE.HOME}' AND
+          name = '${PAGES.HOME}' AND
           (data ->>'lastViewProcessed')::int < ${event.global_position}
       `;
       return db.$executeRaw(query);
@@ -85,7 +85,7 @@ export function createAggregator(
 
   async function start() {
     await init();
-    subscription.start();
+    await subscription.start();
   }
 
   return {
