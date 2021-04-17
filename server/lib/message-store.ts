@@ -1,4 +1,4 @@
-import { DbClient, PgClient } from './database-client';
+import { PgClient } from './database-client';
 
 export type WinterfellEventData = JsonB;
 
@@ -15,17 +15,16 @@ export interface WinterfellEvent {
 }
 
 const SQL_FN = {
-  WRITE: 'SELECT message_store.write_message($1, $2, $3, $4, $5, $6)',
+  WRITE: 'SELECT write_message($1, $2, $3, $4, $5, $6)',
 };
 
 type JsonB = Record<string, unknown>;
-type WriteValues = [string, string, string, JsonB, JsonB, number];
+type WriteValues = [string, string, string, JsonB, JsonB, number | null];
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function createMessageStore(db: DbClient, pg: PgClient) {
+export function createMessageStore(pg: PgClient) {
   return {
-    getDb: (): DbClient => db,
-    write: async (streamName: string, message: WinterfellEvent, expectedVersion: number) => {
+    write: async (streamName: string, message: WinterfellEvent, expectedVersion: number | null = null) => {
       const values: WriteValues = [
         message.id,
         streamName,

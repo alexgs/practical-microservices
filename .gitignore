@@ -21,6 +21,7 @@
 **/generated
 **/node_modules
 logs/**/*.log
+host/database/message-db/
 
 # Misc. files
 .DS_Store

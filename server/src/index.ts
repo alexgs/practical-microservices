@@ -14,7 +14,7 @@ interface WinterfellRequest extends Hapi.Request {
   app: WinterfellAppState;
 }
 
-const messageStore = createMessageStore(db, pg);
+const messageStore = createMessageStore(pg);
 
 // TODO Would it be better to use [server.bind][1]?
 //   [1]: https://hapi.dev/api/?v=20.1.2#server.bind()
@@ -23,9 +23,7 @@ const plugin: Hapi.Plugin<null> = {
   // eslint-disable-next-line @typescript-eslint/require-await
   register: async (server) => {
     server.ext('onRequest', function (request: WinterfellRequest, h) {
-      const traceId = getUuid();
-      console.log(`>> Starting request with trace ID ${traceId} <<`);
-      request.app.traceId = traceId;
+      request.app.traceId = getUuid();
       return h.continue;
     });
   },
@@ -66,7 +64,7 @@ const main = async () => {
   server.route({
     method: 'POST',
     path: '/api/videos/{videoId}/record-view',
-    handler: (request: WinterfellRequest) => {
+    handler: async (request: WinterfellRequest) => {
       const traceId = request.app.traceId ?? 'missing-trace-id-0001';
       const userId = 2; // TODO Change this after we actually have user registration
       const videoId = request.params.videoId as string;
@@ -86,9 +84,9 @@ const main = async () => {
       const streamName = `viewing-${videoId}`;
       // Closing over the messageStore like this is a form of dependency
       // injection, albeit a very simple, cheap, and brittle one
-      messageStore.write(streamName, event);
+      await messageStore.write(streamName, event).catch(error => console.log(error));
 
-      return { videoId }; // TODO What's an appropriate response payload
+      return { videoId }; // TODO What's an appropriate response payload?
     },
   });
 

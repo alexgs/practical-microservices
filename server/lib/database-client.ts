@@ -11,8 +11,8 @@ import { Pool, QueryResult } from 'pg';
 
 // --- POSTGRESQL ---
 
-const DATABASE_URL = env.get('DATABASE_URL').required().asString();
-const postgresPool = new Pool({ connectionString: DATABASE_URL });
+const MESSAGE_STORE_URL = env.get('MESSAGE_STORE_URL').required().asString();
+const postgresPool = new Pool({ connectionString: MESSAGE_STORE_URL });
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function query(text: string, params: unknown[]): Promise<QueryResult> {
