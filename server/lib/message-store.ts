@@ -30,10 +30,21 @@ const SQL_FN = {
 
 type JsonB = Record<string, unknown>;
 type WriteValues = [string, string, string, JsonB, JsonB, number | null];
+export type MessageStore = ReturnType<typeof createMessageStore>;
+
+interface CreateSubscriptionOptions {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  handlers: Record<string, Function>,
+  streamName: string;
+  subscriberId: string;
+}
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function createMessageStore(pg: PgClient) {
   return {
+    createSubscription: (options: CreateSubscriptionOptions) => {
+      return { start: () => null };
+    },
     write: async (streamName: string, message: EventInput, expectedVersion: number | null = null) => {
       const values: WriteValues = [
         message.id,
