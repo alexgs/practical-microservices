@@ -2,7 +2,8 @@
  * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
  */
 
-import { DbClient, MessageStore, WinterfellEvent } from '../../lib';
+import { DbClient } from '../../lib';
+import { MessageStore, WinterfellEvent } from '../message-store';
 
 export const PAGE = {
   HOME: 'home',

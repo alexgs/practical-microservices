@@ -6,13 +6,14 @@ import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
 import { v4 as getUuid } from 'uuid';
 
-import { createMessageStore, db, pg } from '../lib';
+import { db, pg } from '../lib';
 
 import {
   createAggregator as createHomeAggregator,
   PAGE,
   Startable,
 } from './aggregators/home';
+import { createMessageStore } from './message-store';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 

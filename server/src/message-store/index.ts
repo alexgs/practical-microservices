@@ -2,7 +2,7 @@
  * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
  */
 
-import { PgClient } from './database-client';
+import { PgClient } from '../../lib';
 
 export type WinterfellEventData = JsonB;
 
@@ -41,30 +41,34 @@ interface CreateSubscriptionOptions {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function createMessageStore(pg: PgClient) {
+  function createSubscription (options: CreateSubscriptionOptions) {
+    return {
+      start: () => {
+        console.log(
+          `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
+        );
+      },
+    };
+  }
+
+  async function write (
+    streamName: string,
+    message: EventInput,
+    expectedVersion: number | null = null,
+  ) {
+    const values: WriteValues = [
+      message.id,
+      streamName,
+      message.type,
+      message.data,
+      message.metadata,
+      expectedVersion,
+    ];
+    return pg.query(SQL_FN.WRITE, values);
+  }
+
   return {
-    createSubscription: (options: CreateSubscriptionOptions) => {
-      return {
-        start: () => {
-          console.log(
-            `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
-          );
-        },
-      };
-    },
-    write: async (
-      streamName: string,
-      message: EventInput,
-      expectedVersion: number | null = null,
-    ) => {
-      const values: WriteValues = [
-        message.id,
-        streamName,
-        message.type,
-        message.data,
-        message.metadata,
-        expectedVersion,
-      ];
-      return pg.query(SQL_FN.WRITE, values);
-    },
+    createSubscription,
+    write,
   };
 }
