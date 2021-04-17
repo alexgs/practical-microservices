@@ -8,11 +8,17 @@ import { PgClient } from '../../lib';
 
 import { EventInput, JsonB } from './index';
 
+export type WriteFn = (
+  streamName: string,
+  message: EventInput,
+  expectedVersion?: number | null,
+) => Promise<QueryResult>;
+
 type WriteValues = [string, string, string, JsonB, JsonB, number | null];
 
 const SQL_WRITE_FN = 'SELECT write_message($1, $2, $3, $4, $5, $6)';
 
-export function writeFactory(pg: PgClient) {
+export function writeFactory(pg: PgClient): WriteFn {
   return async function write(
     streamName: string,
     message: EventInput,

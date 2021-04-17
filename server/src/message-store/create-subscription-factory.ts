@@ -4,6 +4,8 @@
 
 import { Startable } from '../types';
 
+import { WriteFn } from './write-factory';
+
 export interface CreateSubscriptionOptions {
   // eslint-disable-next-line @typescript-eslint/ban-types
   handlers: Record<string, Function>;
@@ -11,17 +13,39 @@ export interface CreateSubscriptionOptions {
   subscriberId: string;
 }
 
-export interface Subscription extends Startable {}
+export interface FactoryConfig {
+  read: any;
+  readLastMessage: any;
+  write: WriteFn;
+}
 
-export function createSubscriptionFactory() {
+export interface Subscription extends Startable {
+  getPosition: () => void;
+  savePosition: () => void;
+  stop: () => void;
+  tick: () => void;
+}
+
+export function createSubscriptionFactory(config: FactoryConfig) {
   return function createSubscription(options: CreateSubscriptionOptions): Subscription {
+    const subscriberStreamName = `subscriberPosition-${options.subscriberId}`;
+    let currentPosition = 0
+    let messagesSinceLastPositionSave = 0
+    let keepGoing = true
+
+    function start() {
+      console.log(
+        `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
+      );
+      return Promise.resolve();
+    }
+
     return {
-      start: () => {
-        console.log(
-          `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
-        );
-        return Promise.resolve();
-      },
+      start,
+      getPosition: () => null,
+      savePosition: () => null,
+      stop: () => null,
+      tick: () => null,
     };
   };
 }

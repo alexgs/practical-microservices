@@ -2,8 +2,6 @@
  * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
  */
 
-import { QueryResult } from 'pg';
-
 import { PgClient } from '../../lib';
 
 import {
@@ -11,7 +9,7 @@ import {
   Subscription,
   createSubscriptionFactory,
 } from './create-subscription-factory';
-import { writeFactory } from './write-factory';
+import { WriteFn, writeFactory } from './write-factory';
 
 export type JsonB = Record<string, unknown>;
 
@@ -24,11 +22,7 @@ export interface EventInput {
 
 export interface MessageStore {
   createSubscription: (options: CreateSubscriptionOptions) => Subscription;
-  write: (
-    streamName: string,
-    message: EventInput,
-    expectedVersion?: number | null,
-  ) => Promise<QueryResult>;
+  write: WriteFn;
 }
 
 export type WinterfellEventData = JsonB;
@@ -45,8 +39,13 @@ export interface WinterfellEventMetadata extends JsonB {
 }
 
 export function createMessageStore(pg: PgClient): MessageStore {
+  const write = writeFactory(pg);
   return {
-    createSubscription: createSubscriptionFactory(),
-    write: writeFactory(pg),
+    write,
+    createSubscription: createSubscriptionFactory({
+      write,
+      read: () => null,
+      readLastMessage: () => null,
+    }),
   };
 }
