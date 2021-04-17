@@ -4,12 +4,12 @@
 
 import { DbClient, MessageStore, WinterfellEvent } from '../../lib';
 
-const PAGE = {
+export const PAGE = {
   HOME: 'home',
 };
 
-interface Startable {
-  start: () => void;
+export interface Startable {
+  start: () => Promise<void>;
 }
 
 interface Aggregator extends Startable {

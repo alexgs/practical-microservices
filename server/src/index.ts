@@ -8,6 +8,12 @@ import { v4 as getUuid } from 'uuid';
 
 import { createMessageStore, db, pg } from '../lib';
 
+import {
+  createAggregator as createHomeAggregator,
+  PAGE,
+  Startable,
+} from './aggregators/home';
+
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
 interface WinterfellAppState extends Hapi.RequestApplicationState {
@@ -40,11 +46,30 @@ const main = async () => {
 
   await server.register(plugin);
 
+  const homeAggregator = createHomeAggregator(db, messageStore);
+  const aggregators: Startable[] = [homeAggregator];
+  for (const ag of aggregators) {
+    await ag.start();
+  }
+
   server.route({
     method: 'GET',
     path: '/',
     handler: () => {
       return 'Hello Winterfell!';
+    },
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/api/pages/home',
+    handler: async (request: WinterfellRequest, h) => {
+      const data = await db.pages.findFirst({
+        where: { name: PAGE.HOME },
+      });
+      return h
+        .response({ data })
+        .header('X-Trace-ID', request.app.traceId ?? 'missing-trace-id-0002');
     },
   });
 
@@ -88,7 +113,9 @@ const main = async () => {
       const streamName = `viewing-${videoId}`;
       // Closing over the messageStore like this is a form of dependency
       // injection, albeit a very simple, cheap, and brittle one
-      await messageStore.write(streamName, event).catch(error => console.log(error));
+      await messageStore
+        .write(streamName, event)
+        .catch((error) => console.log(error));
 
       return { videoId }; // TODO What's an appropriate response payload?
     },
