@@ -1,3 +1,7 @@
+/*
+ * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ */
+
 // TypeScript support for `node-postgres` seems to be kind of crap (or uses a
 //   lot of generics), so turn off a bunch of warnings in this file.
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
