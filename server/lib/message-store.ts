@@ -6,16 +6,22 @@ import { PgClient } from './database-client';
 
 export type WinterfellEventData = JsonB;
 
-export interface WinterfellEventMetadata extends JsonB {
-  traceId: string;
-  userId: number;
-}
-
-export interface WinterfellEvent {
+export interface EventInput {
   id: string;
   type: string;
   metadata: WinterfellEventMetadata;
   data: WinterfellEventData;
+}
+
+export interface WinterfellEvent extends EventInput {
+  global_position: number;
+  position: number;
+  stream_name: string;
+}
+
+export interface WinterfellEventMetadata extends JsonB {
+  traceId: string;
+  userId: number;
 }
 
 const SQL_FN = {
@@ -28,7 +34,7 @@ type WriteValues = [string, string, string, JsonB, JsonB, number | null];
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function createMessageStore(pg: PgClient) {
   return {
-    write: async (streamName: string, message: WinterfellEvent, expectedVersion: number | null = null) => {
+    write: async (streamName: string, message: EventInput, expectedVersion: number | null = null) => {
       const values: WriteValues = [
         message.id,
         streamName,
