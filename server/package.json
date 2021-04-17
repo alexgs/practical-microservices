@@ -26,11 +26,13 @@
     "@hapi/hapi": "^20.1.2",
     "@prisma/client": "^2.20.1",
     "env-var": "^7.0.0",
+    "pg": "^8.6.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/hapi__hapi": "^20.0.5",
     "@types/node": "^14.14.37",
+    "@types/pg": "^7.14.11",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
