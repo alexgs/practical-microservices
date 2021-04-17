@@ -2,7 +2,7 @@ import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
 import { v4 as getUuid } from 'uuid';
 
-import { createMessageStore, db } from '../lib';
+import { createMessageStore, db, pg } from '../lib';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
@@ -14,7 +14,7 @@ interface WinterfellRequest extends Hapi.Request {
   app: WinterfellAppState;
 }
 
-const messageStore = createMessageStore(db);
+const messageStore = createMessageStore(db, pg);
 
 // TODO Would it be better to use [server.bind][1]?
 //   [1]: https://hapi.dev/api/?v=20.1.2#server.bind()
@@ -84,6 +84,8 @@ const main = async () => {
         },
       };
       const streamName = `viewing-${videoId}`;
+      // Closing over the messageStore like this is a form of dependency
+      // injection, albeit a very simple, cheap, and brittle one
       messageStore.write(streamName, event);
 
       return { videoId }; // TODO What's an appropriate response payload

@@ -9,14 +9,21 @@ import { PrismaClient } from '@prisma/client';
 import * as env from 'env-var';
 import { Pool, QueryResult } from 'pg';
 
+// --- POSTGRESQL ---
+
 const DATABASE_URL = env.get('DATABASE_URL').required().asString();
 const postgresPool = new Pool({ connectionString: DATABASE_URL });
+
+// eslint-disable-next-line @typescript-eslint/require-await
+async function query(text: string, params: unknown[]): Promise<QueryResult> {
+  return postgresPool.query(text, params);
+}
+
+export const pg = { query };
+export type PgClient = typeof pg;
+
+// --- PRISMA ---
 
 export type DbClient = PrismaClient;
 
 export const db = new PrismaClient();
-
-// eslint-disable-next-line @typescript-eslint/require-await
-export async function query(text: string, params: string[]): Promise<QueryResult> {
-  return postgresPool.query(text, params);
-}
