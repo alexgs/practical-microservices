@@ -1,2 +1,2 @@
-export { DbClient, db } from './database-client';
+export { DbClient, db, query } from './database-client';
 export * from './message-store';
