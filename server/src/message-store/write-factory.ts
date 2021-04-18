@@ -16,7 +16,7 @@ export type WriteFn = (
 
 export type WriteResult = Promise<QueryResult<{write_message: number}>>;
 
-type WriteValues = [string, string, string, JsonB, JsonB, number | null];
+type WriteValues = [string, string, string, JsonB, JsonB | null, number | null];
 
 const SQL_WRITE_FN = 'SELECT write_message($1, $2, $3, $4, $5, $6)';
 
@@ -31,7 +31,7 @@ export function writeFactory(pg: PgClient): WriteFn {
       streamName,
       message.type,
       message.data,
-      message.metadata,
+      message.metadata ?? null,
       expectedVersion,
     ];
     return pg.query<{write_message: number}>(SQL_WRITE_FN, values);

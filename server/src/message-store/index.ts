@@ -9,6 +9,7 @@ import {
   Subscription,
   createSubscriptionFactory,
 } from './create-subscription-factory';
+import { readerFactory } from './reader-factory';
 import { WriteFn, writeFactory } from './write-factory';
 
 export type JsonB = Record<string, unknown>;
@@ -39,13 +40,14 @@ export interface WinterfellEventMetadata extends JsonB {
 }
 
 export function createMessageStore(pg: PgClient): MessageStore {
+  const reader = readerFactory(pg);
   const write = writeFactory(pg);
   return {
     write,
     createSubscription: createSubscriptionFactory({
       write,
-      read: () => null,
-      readLastMessage: () => null,
+      read: reader.read,
+      readLastMessage: reader.readLastMessage,
     }),
   };
 }

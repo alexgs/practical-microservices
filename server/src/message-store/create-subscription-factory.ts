@@ -8,6 +8,7 @@ import { logger, sleep } from '../../lib';
 import { Startable } from '../types';
 
 import { EventInput, WinterfellEvent } from './index';
+import { Reader } from './reader-factory';
 import { WriteFn, WriteResult } from './write-factory';
 
 export interface CreateSubscriptionOptions {
@@ -21,12 +22,8 @@ export interface CreateSubscriptionOptions {
 }
 
 export interface FactoryCrew {
-  read: (
-    streamName: string,
-    fromPosition?: number,
-    maxMessages?: number,
-  ) => Promise<WinterfellEvent[]>;
-  readLastMessage: (streamName: string) => Promise<WinterfellEvent>;
+  read: Reader['read'];
+  readLastMessage: Reader['readLastMessage'];
   write: WriteFn;
 }
 
