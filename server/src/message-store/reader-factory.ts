@@ -15,6 +15,25 @@ export interface Reader {
   readLastMessage: (streamName: string) => Promise<WinterfellEvent>;
 }
 
+/** @internal */
+export const SQL = {
+  READ_ALL_EVENTS: 'SELECT * FROM messages WHERE global_position > $1 LIMIT $2',
+};
+
+/** @internal */
+export async function readAllEvents(
+  pg: PgClient,
+  fromPosition = 0,
+  maxMessages = 1000,
+): Promise<WinterfellEvent[]> {
+  const result = await pg.query<WinterfellEvent>(SQL.READ_ALL_EVENTS, [
+    fromPosition,
+    maxMessages,
+  ]);
+  return result.rows;
+}
+
+/** @public */
 export function readerFactory(pg: PgClient): Reader {
   async function read(
     streamName: string,
