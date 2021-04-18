@@ -31,10 +31,19 @@ export interface FactoryConfig {
 }
 
 export interface Subscription extends Startable {
+  // "Hidden" methods exported for testing
+  _poll: () => Promise<void>;
+
   getPosition: () => Promise<number>;
   savePosition: (position: number) => WriteResult;
   stop: () => void;
   tick: () => void;
+}
+
+async function sleep(milliseconds: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, milliseconds);
+  })
 }
 
 export function createSubscriptionFactory(config: FactoryConfig) {
@@ -42,9 +51,7 @@ export function createSubscriptionFactory(config: FactoryConfig) {
     options: CreateSubscriptionOptions,
   ): Subscription {
     const subscriberStreamName = `subscriberPosition-${options.subscriberId}`;
-    let currentPosition = 0;
-    let messagesSinceLastPositionSave = 0;
-    let keepGoing = true;
+    let continuePolling = true;
 
     const finalOptions: Readonly<Required<CreateSubscriptionOptions>> = {
       messagesPerTick: 100,
@@ -56,7 +63,7 @@ export function createSubscriptionFactory(config: FactoryConfig) {
 
     async function getPosition(): Promise<number> {
       const message = await config.readLastMessage(subscriberStreamName);
-      // Read `position` from the event data, not the `position` field (which is the position in the event's stream
+      // Read `position` from the event data, not the `position` field (which is the position in the event's stream)
       const position = message?.data?.position;
       if (typeof position === 'string') {
         return parseInt(position, 10);
@@ -65,6 +72,21 @@ export function createSubscriptionFactory(config: FactoryConfig) {
         return position
       }
       return 0;
+    }
+
+    async function poll() {
+      const currentPosition = await getPosition();
+
+      while (continuePolling) {
+        // Fetch new messages
+        // - Get current position
+        // - Query message store
+        // Process the messages
+        // - Call handler
+        // - Update position
+        // Save new position
+        // Sleep
+      }
     }
 
     async function savePosition(position: number): WriteResult {
@@ -76,18 +98,28 @@ export function createSubscriptionFactory(config: FactoryConfig) {
       return config.write(subscriberStreamName, positionEvent);
     }
 
-    function start() {
+    function start(): Promise<void> {
       console.log(
-        `>> Starting subscription to stream "${options.streamName}" for subscriber "${options.subscriberId}" <<`,
+        `>> Starting subscription to stream "${finalOptions.streamName}" for subscriber "${finalOptions.subscriberId}" <<`,
       );
-      return Promise.resolve();
+      return poll();
+    }
+
+    function stop() {
+      console.log(
+        `>> Stopping subscription for subscriber "${finalOptions.subscriberId}" <<`,
+      );
+      continuePolling = false;
     }
 
     return {
+      // "Hidden" methods exported for testing
+      _poll: poll,
+
       getPosition,
       savePosition,
       start,
-      stop: () => null,
+      stop,
       tick: () => null,
     };
   };
