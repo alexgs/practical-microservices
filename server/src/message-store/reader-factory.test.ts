@@ -4,14 +4,64 @@
 
 import { pg as theRealAdapter } from '../../lib';
 
+import { ALL_EVENTS_STREAM } from './index';
 import {
   SQL,
   readAllEvents,
   readCategoryStream,
   readEntityStream,
+  readerFactory,
 } from './reader-factory';
 
 describe('`ReaderFactory` module', () => {
+  describe('The `Reader` object', () => {
+    describe('function `read`', () => {
+      it('correctly routes reading all events', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const fromPosition = 1001;
+        const maxMessages = 27;
+
+        const reader = readerFactory(mockDb);
+        await reader.read(ALL_EVENTS_STREAM, fromPosition, maxMessages);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_ALL_EVENTS);
+        expect(args[1]).toEqual([fromPosition, maxMessages]);
+      });
+
+      it('correctly routes reading an entity stream', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const fromPosition = 6453;
+        const maxMessages = 62;
+        const streamName = 'videoViewed-1';
+
+        const reader = readerFactory(mockDb);
+        await reader.read(streamName, fromPosition, maxMessages);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_ENTITY_STREAM);
+        expect(args[1]).toEqual([streamName, fromPosition, maxMessages]);
+      });
+
+      it('correctly routes reading a category stream', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const fromPosition = 296;
+        const maxMessages = 38;
+        const streamName = 'videoViewed';
+
+        const reader = readerFactory(mockDb);
+        await reader.read(streamName, fromPosition, maxMessages);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_CATEGORY_STREAM);
+        expect(args[1]).toEqual([streamName, fromPosition, maxMessages]);
+      });
+    });
+  });
+
   describe('Helper functions', () => {
     describe('`readAllEvents`', () => {
       it('queries the database', async () => {

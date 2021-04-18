@@ -4,7 +4,7 @@
 
 import { PgClient } from '../../lib';
 
-import { WinterfellEvent } from './index';
+import { ALL_EVENTS_STREAM, WinterfellEvent, isEntityStream } from './index';
 
 export interface Reader {
   read: (
@@ -71,7 +71,15 @@ export function readerFactory(pg: PgClient): Reader {
     streamName: string,
     fromPosition = 0,
     maxMessages = 1000,
-  ): Promise<WinterfellEvent[]> {}
+  ): Promise<WinterfellEvent[]> {
+    if (streamName === ALL_EVENTS_STREAM) {
+      return readAllEvents(pg, fromPosition, maxMessages);
+    }
+    if (isEntityStream(streamName)) {
+      return readEntityStream(pg, streamName, fromPosition, maxMessages);
+    }
+    return readCategoryStream(pg, streamName, fromPosition, maxMessages);
+  }
 
   async function readLastMessage(
     streamName: string,

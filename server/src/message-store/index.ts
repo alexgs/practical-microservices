@@ -39,6 +39,8 @@ export interface WinterfellEventMetadata extends JsonB {
   userId: number;
 }
 
+export const ALL_EVENTS_STREAM = '$all';
+
 export function createMessageStore(pg: PgClient): MessageStore {
   const reader = readerFactory(pg);
   const write = writeFactory(pg);
@@ -50,4 +52,9 @@ export function createMessageStore(pg: PgClient): MessageStore {
       readLastMessage: reader.readLastMessage,
     }),
   };
+}
+
+export function isEntityStream(streamName: string): boolean {
+  // Entity stream names have a dash
+  return streamName.includes('-');
 }
