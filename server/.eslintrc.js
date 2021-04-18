@@ -21,7 +21,7 @@ module.exports = {
         project: ['./tsconfig.json'],
         tsconfigRootDir: __dirname,
       },
-      plugins: ['@typescript-eslint', 'import'],
+      plugins: ['@typescript-eslint', 'import', 'jest'],
       extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
@@ -29,6 +29,7 @@ module.exports = {
         'plugin:import/errors',
         'plugin:import/warnings',
         'plugin:import/typescript',
+        'plugin:jest/recommended',
         'prettier',
         'prettier/@typescript-eslint',
       ],
@@ -63,13 +64,11 @@ module.exports = {
       },
     },
     {
-      // Disable rules that cause errors with how we're importing design tokens
-      files: ['pages/**/*.tsx'],
+      files: ['**/*.test.ts'],
       rules: {
         '@typescript-eslint/no-unsafe-member-access': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
-        '@typescript-eslint/no-unsafe-assignment': 'off'
-      }
-    }
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+      },
+    },
   ],
 };
