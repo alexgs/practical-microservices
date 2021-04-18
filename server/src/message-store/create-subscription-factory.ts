@@ -20,7 +20,7 @@ export interface CreateSubscriptionOptions {
   tickIntervalMs?: number;
 }
 
-export interface FactoryConfig {
+export interface FactoryCrew {
   read: (
     streamName: string,
     fromPosition?: number,
@@ -48,7 +48,7 @@ async function sleep(milliseconds: number): Promise<void> {
   })
 }
 
-export function createSubscriptionFactory(config: FactoryConfig) {
+export function createSubscriptionFactory(crew: FactoryCrew) {
   return function createSubscription(
     options: CreateSubscriptionOptions,
   ): Subscription {
@@ -64,7 +64,7 @@ export function createSubscriptionFactory(config: FactoryConfig) {
     };
 
     async function getPosition(): Promise<number> {
-      const message = await config.readLastMessage(subscriberStreamName);
+      const message = await crew.readLastMessage(subscriberStreamName);
       // Read `position` from the event data, not the `position` field (which is the position in the event's stream)
       const position = message?.data?.position;
       if (typeof position === 'string') {
@@ -97,7 +97,7 @@ export function createSubscriptionFactory(config: FactoryConfig) {
         type: 'Read',
         data: { position }
       }
-      return config.write(subscriberStreamName, positionEvent);
+      return crew.write(subscriberStreamName, positionEvent);
     }
 
     function start(): Promise<void> {

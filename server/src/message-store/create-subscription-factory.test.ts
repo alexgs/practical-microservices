@@ -1,15 +1,16 @@
 import {
   CreateSubscriptionOptions,
+  FactoryCrew,
   createSubscriptionFactory,
 } from './create-subscription-factory';
 
-interface MockFactoryConfig {
-  read: jest.Mock;
-  readLastMessage: jest.Mock;
-  write: jest.Mock;
-}
+type Mocked<Type> = {
+  [Property in keyof Type]: jest.Mock
+};
 
-function getConfig(override?: Partial<MockFactoryConfig>): MockFactoryConfig {
+type MockCrew = Mocked<FactoryCrew>
+
+function getConfig(override?: Partial<MockCrew>): MockCrew {
   return {
     read: jest.fn(),
     readLastMessage: jest.fn(),
@@ -31,7 +32,7 @@ function getOptions(
 
 describe('The `Subscription` object', () => {
   describe('The `getPosition` function', () => {
-    it('calls the `readLastMessage` function', async () => {
+    it('calls the `readLastMessage` crew function', async () => {
       const POSITION = 17;
       const config = getConfig({
         readLastMessage: jest
@@ -48,7 +49,7 @@ describe('The `Subscription` object', () => {
   });
 
   describe('The `savePosition` function', () => {
-    it('calls the message writer', async () => {
+    it('calls the `writer` crew function', async () => {
       const config = getConfig();
       const options = getOptions();
       const createSubscription = createSubscriptionFactory(config);
