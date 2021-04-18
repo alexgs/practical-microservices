@@ -32,6 +32,7 @@ export interface FactoryConfig {
 
 export interface Subscription extends Startable {
   // "Hidden" methods exported for testing
+  _getPosition: () => Promise<number>;
   _poll: () => Promise<void>;
   _savePosition: (position: number) => WriteResult;
 
@@ -115,6 +116,7 @@ export function createSubscriptionFactory(config: FactoryConfig) {
 
     return {
       // "Hidden" methods exported for testing
+      _getPosition: getPosition,
       _poll: poll,
       _savePosition: savePosition,
 

@@ -9,7 +9,7 @@ interface MockFactoryConfig {
   write: jest.Mock;
 }
 
-function getConfig(override?: MockFactoryConfig): MockFactoryConfig {
+function getConfig(override?: Partial<MockFactoryConfig>): MockFactoryConfig {
   return {
     read: jest.fn(),
     readLastMessage: jest.fn(),
@@ -30,6 +30,23 @@ function getOptions(
 }
 
 describe('The `Subscription` object', () => {
+  describe('The `getPosition` function', () => {
+    it('calls the `readLastMessage` function', async () => {
+      const POSITION = 17;
+      const config = getConfig({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(config);
+      const subscription = createSubscription(options);
+
+      await subscription._getPosition();
+      expect(config.readLastMessage).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('The `savePosition` function', () => {
     it('calls the message writer', async () => {
       const config = getConfig();
@@ -50,4 +67,6 @@ describe('The `Subscription` object', () => {
       });
     });
   });
+
+  describe.skip('The `poll` function', () => {});
 });
