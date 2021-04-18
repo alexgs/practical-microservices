@@ -10,7 +10,7 @@ type Mocked<Type> = {
 
 type MockCrew = Mocked<FactoryCrew>
 
-function getConfig(override?: Partial<MockCrew>): MockCrew {
+function getCrew(override?: Partial<MockCrew>): MockCrew {
   return {
     read: jest.fn(),
     readLastMessage: jest.fn(),
@@ -20,7 +20,7 @@ function getConfig(override?: Partial<MockCrew>): MockCrew {
 }
 
 function getOptions(
-  override?: CreateSubscriptionOptions,
+  override?: Partial<CreateSubscriptionOptions>,
 ): CreateSubscriptionOptions {
   return {
     handlers: {},
@@ -34,7 +34,7 @@ describe('The `Subscription` object', () => {
   describe('The `getPosition` function', () => {
     it('calls the `readLastMessage` crew function', async () => {
       const POSITION = 17;
-      const config = getConfig({
+      const config = getCrew({
         readLastMessage: jest
           .fn()
           .mockReturnValue({ data: { position: POSITION } }),
@@ -46,11 +46,55 @@ describe('The `Subscription` object', () => {
       await subscription._getPosition();
       expect(config.readLastMessage).toHaveBeenCalledTimes(1);
     });
+
+    it('handles "position" value as a string', async () => {
+      const POSITION = 15;
+      const config = getCrew({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION.toString() } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(config);
+      const subscription = createSubscription(options);
+
+      const result = await subscription._getPosition();
+      expect(result).toEqual(POSITION);
+    });
+
+    it('handles "position" value as a number', async () => {
+      const POSITION = 87;
+      const config = getCrew({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(config);
+      const subscription = createSubscription(options);
+
+      const result = await subscription._getPosition();
+      expect(result).toEqual(POSITION);
+    });
+
+    it('handles "position" value is missing', async () => {
+      const config = getCrew({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { otherThing: 'Two' } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(config);
+      const subscription = createSubscription(options);
+
+      const result = await subscription._getPosition();
+      expect(result).toEqual(0);
+    });
   });
 
   describe('The `savePosition` function', () => {
     it('calls the `writer` crew function', async () => {
-      const config = getConfig();
+      const config = getCrew();
       const options = getOptions();
       const createSubscription = createSubscriptionFactory(config);
       const subscription = createSubscription(options);
