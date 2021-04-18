@@ -20,7 +20,8 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "seed": "prisma db seed --preview-feature",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "test": "jest"
   },
   "dependencies": {
     "@hapi/hapi": "^20.1.2",
@@ -39,6 +40,8 @@
     "eslint": "^7.16.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.5",
+    "jest": "^26.6.3",
     "prettier": "2.2.1",
     "prisma": "^2.20.1",
     "ts-node-dev": "^1.1.6",

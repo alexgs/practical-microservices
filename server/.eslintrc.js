@@ -10,7 +10,7 @@ module.exports = {
     ecmaVersion: 6,
     sourceType: 'module',
   },
-  plugins: [],
+  plugins: ['jest'],
   extends: ['eslint:recommended', 'prettier'],
   overrides: [
     {
