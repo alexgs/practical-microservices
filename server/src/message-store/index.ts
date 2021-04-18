@@ -16,7 +16,7 @@ export type JsonB = Record<string, unknown>;
 export interface EventInput {
   id: string;
   type: string;
-  metadata: WinterfellEventMetadata;
+  metadata?: WinterfellEventMetadata;
   data: WinterfellEventData;
 }
 

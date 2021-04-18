@@ -12,7 +12,9 @@ export type WriteFn = (
   streamName: string,
   message: EventInput,
   expectedVersion?: number | null,
-) => Promise<QueryResult>;
+) => WriteResult;
+
+export type WriteResult = Promise<QueryResult<{write_message: number}>>;
 
 type WriteValues = [string, string, string, JsonB, JsonB, number | null];
 
@@ -32,6 +34,6 @@ export function writeFactory(pg: PgClient): WriteFn {
       message.metadata,
       expectedVersion,
     ];
-    return pg.query(SQL_WRITE_FN, values);
+    return pg.query<{write_message: number}>(SQL_WRITE_FN, values);
   };
 }

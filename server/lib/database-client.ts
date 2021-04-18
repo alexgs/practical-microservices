@@ -19,8 +19,8 @@ const MESSAGE_STORE_URL = env.get('MESSAGE_STORE_URL').required().asString();
 const postgresPool = new Pool({ connectionString: MESSAGE_STORE_URL });
 
 // eslint-disable-next-line @typescript-eslint/require-await
-async function query(text: string, params: unknown[]): Promise<QueryResult> {
-  return postgresPool.query(text, params);
+async function query<R>(text: string, params: unknown[]): Promise<QueryResult<R>> {
+  return postgresPool.query<R>(text, params);
 }
 
 export const pg = { query };

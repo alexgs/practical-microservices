@@ -2,10 +2,12 @@
  * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
  */
 
+import { v4 as generateUuid } from 'uuid';
+
 import { Startable } from '../types';
 
-import { WinterfellEvent } from './index';
-import { WriteFn } from './write-factory';
+import { EventInput, WinterfellEvent } from './index';
+import { WriteFn, WriteResult } from './write-factory';
 
 export interface CreateSubscriptionOptions {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -29,8 +31,8 @@ export interface FactoryConfig {
 }
 
 export interface Subscription extends Startable {
-  getPosition: () => void;
-  savePosition: () => void;
+  getPosition: () => Promise<number>;
+  savePosition: (position: number) => WriteResult;
   stop: () => void;
   tick: () => void;
 }
@@ -52,9 +54,26 @@ export function createSubscriptionFactory(config: FactoryConfig) {
       ...options,
     };
 
-    async function getPosition() {
+    async function getPosition(): Promise<number> {
       const message = await config.readLastMessage(subscriberStreamName);
-      return message?.position ?? 0;
+      // Read `position` from the event data, not the `position` field (which is the position in the event's stream
+      const position = message?.data?.position;
+      if (typeof position === 'string') {
+        return parseInt(position, 10);
+      }
+      if (typeof position === 'number') {
+        return position
+      }
+      return 0;
+    }
+
+    async function savePosition(position: number): WriteResult {
+      const positionEvent: EventInput = {
+        id: generateUuid(),
+        type: 'Read',
+        data: { position }
+      }
+      return config.write(subscriberStreamName, positionEvent);
     }
 
     function start() {
@@ -66,8 +85,8 @@ export function createSubscriptionFactory(config: FactoryConfig) {
 
     return {
       getPosition,
+      savePosition,
       start,
-      savePosition: () => null,
       stop: () => null,
       tick: () => null,
     };
