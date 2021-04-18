@@ -1,3 +1,5 @@
+import { v4 as generateUuid } from 'uuid';
+
 import { sleep } from '../../lib';
 import { MockObject } from '../types';
 
@@ -6,12 +8,40 @@ import {
   FactoryCrew,
   createSubscriptionFactory,
 } from './create-subscription-factory';
+import { WinterfellEvent } from './index';
 
-type MockCrew = MockObject<FactoryCrew>
+type MockCrew = MockObject<FactoryCrew>;
+
+interface EventGenOptions {
+  count: number;
+  eventType: string;
+  startPosition: number;
+  streamName: string;
+}
+
+function generateMockEvents(options: EventGenOptions): WinterfellEvent[] {
+  const output: WinterfellEvent[] = [];
+  let i = 0;
+  while (i < options.count) {
+    const position = options.startPosition + i;
+    const globalPos = position + 1000;
+    const event: WinterfellEvent = {
+      id: generateUuid(),
+      type: options.eventType,
+      global_position: globalPos,
+      position,
+      stream_name: options.streamName,
+      data: { codeName: 'Winter Soldier' },
+    };
+    output.push(event);
+    i++;
+  }
+  return output;
+}
 
 function getCrew(override?: Partial<MockCrew>): MockCrew {
   return {
-    read: jest.fn(),
+    read: jest.fn().mockResolvedValue([]),
     readLastMessage: jest.fn(),
     write: jest.fn(),
     ...override,
@@ -130,6 +160,60 @@ describe('The `Subscription` object', () => {
       subscription.stop();
 
       expect(config.readLastMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the `read` crew function', async () => {
+      const POSITION = 23;
+      const crew = getCrew({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(crew);
+      const subscription = createSubscription(options);
+
+      // Start polling in the background, wait, and stop
+      void subscription.start();
+      await sleep(50);
+      subscription.stop();
+
+      expect(crew.read).toHaveBeenCalledTimes(1);
+
+      const args = crew.read.mock.calls[0];
+      expect(args[0]).toEqual(options.streamName);
+      expect(args[1]).toEqual(POSITION + 1);
+    });
+
+    it('calls the "VideoViewed" handler for "VideoViewed" events', async () => {
+      const POSITION = 23;
+      const options = getOptions({
+        handlers: { VideoViewed: jest.fn() },
+      });
+      const eventOptions = {
+        streamName: options.streamName,
+        count: 3,
+        startPosition: POSITION + 1,
+        eventType: 'VideoViewed',
+      };
+      const events = generateMockEvents(eventOptions);
+      const crew = getCrew({
+        read: jest.fn().mockResolvedValue(events),
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const createSubscription = createSubscriptionFactory(crew);
+      const subscription = createSubscription(options);
+
+      // Start polling in the background, wait, and stop
+      void subscription.start();
+      await sleep(50);
+      subscription.stop();
+
+      expect(options.handlers.VideoViewed).toHaveBeenCalledTimes(
+        eventOptions.count,
+      );
     });
   });
 });

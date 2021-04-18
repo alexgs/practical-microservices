@@ -11,8 +11,7 @@ import { EventInput, WinterfellEvent } from './index';
 import { WriteFn, WriteResult } from './write-factory';
 
 export interface CreateSubscriptionOptions {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  handlers: Record<string, Function>;
+  handlers: Record<string, MessageHandler>;
   messagesPerTick?: number;
   originStreamName?: string | null;
   positionUpdateIntervalMs?: number;
@@ -30,6 +29,8 @@ export interface FactoryCrew {
   readLastMessage: (streamName: string) => Promise<WinterfellEvent>;
   write: WriteFn;
 }
+
+export type MessageHandler = (event: WinterfellEvent) => Promise<void>;
 
 export interface Subscription extends Startable {
   // "Hidden" methods exported for testing
@@ -72,16 +73,18 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
     }
 
     async function poll() {
-      const currentPosition = await getPosition();
-
       while (continuePolling) {
         // Fetch new messages
-        // - Get current position
-        // - Query message store
+        const currentPosition = await getPosition();
+        const newMessages = await crew.read(finalOptions.streamName, currentPosition + 1);
+
         // Process the messages
-        // - Call handler
-        // - Update position
+        for (const message of newMessages) {
+          await finalOptions.handlers[message.type](message);
+        }
+
         // Save new position
+
         await sleep(finalOptions.tickIntervalMs);
       }
     }
