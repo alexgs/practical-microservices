@@ -1,14 +1,13 @@
+import { sleep } from '../../lib';
+import { MockObject } from '../types';
+
 import {
   CreateSubscriptionOptions,
   FactoryCrew,
   createSubscriptionFactory,
 } from './create-subscription-factory';
 
-type Mocked<Type> = {
-  [Property in keyof Type]: jest.Mock
-};
-
-type MockCrew = Mocked<FactoryCrew>
+type MockCrew = MockObject<FactoryCrew>
 
 function getCrew(override?: Partial<MockCrew>): MockCrew {
   return {
@@ -113,5 +112,24 @@ describe('The `Subscription` object', () => {
     });
   });
 
-  describe.skip('The `poll` function', () => {});
+  describe('The `start` function', () => {
+    it('calls the `readLastMessage` crew function', async () => {
+      const POSITION = 17;
+      const config = getCrew({
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const options = getOptions();
+      const createSubscription = createSubscriptionFactory(config);
+      const subscription = createSubscription(options);
+
+      // Start polling in the background, wait, and stop
+      void subscription.start();
+      await sleep(50);
+      subscription.stop();
+
+      expect(config.readLastMessage).toHaveBeenCalledTimes(1);
+    });
+  });
 });

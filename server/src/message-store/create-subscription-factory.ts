@@ -4,6 +4,7 @@
 
 import { v4 as generateUuid } from 'uuid';
 
+import { logger, sleep } from '../../lib';
 import { Startable } from '../types';
 
 import { EventInput, WinterfellEvent } from './index';
@@ -40,12 +41,6 @@ export interface Subscription extends Startable {
   savePosition: (position: number) => WriteResult;
   stop: () => void;
   tick: () => void;
-}
-
-async function sleep(milliseconds: number): Promise<void> {
-  return new Promise(resolve => {
-    setTimeout(resolve, milliseconds);
-  })
 }
 
 export function createSubscriptionFactory(crew: FactoryCrew) {
@@ -87,7 +82,7 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
         // - Call handler
         // - Update position
         // Save new position
-        // Sleep
+        await sleep(finalOptions.tickIntervalMs);
       }
     }
 
@@ -101,14 +96,14 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
     }
 
     function start(): Promise<void> {
-      console.log(
+      logger.debug(
         `>> Starting subscription to stream "${finalOptions.streamName}" for subscriber "${finalOptions.subscriberId}" <<`,
       );
       return poll();
     }
 
     function stop() {
-      console.log(
+      logger.debug(
         `>> Stopping subscription for subscriber "${finalOptions.subscriberId}" <<`,
       );
       continuePolling = false;
