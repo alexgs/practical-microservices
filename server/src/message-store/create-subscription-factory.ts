@@ -83,8 +83,8 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
           await finalOptions.handlers[message.type](message);
         }
 
-        // Save new position
-
+        // Save new position and wait
+        await savePosition(currentPosition + newMessages.length);
         await sleep(finalOptions.tickIntervalMs);
       }
     }

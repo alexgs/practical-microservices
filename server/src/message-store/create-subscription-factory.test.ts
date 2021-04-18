@@ -185,7 +185,7 @@ describe('The `Subscription` object', () => {
       expect(args[1]).toEqual(POSITION + 1);
     });
 
-    it('calls the "VideoViewed" handler for "VideoViewed" events', async () => {
+    it('calls the `VideoViewed` handler for "VideoViewed" events', async () => {
       const POSITION = 23;
       const options = getOptions({
         handlers: { VideoViewed: jest.fn() },
@@ -214,6 +214,43 @@ describe('The `Subscription` object', () => {
       expect(options.handlers.VideoViewed).toHaveBeenCalledTimes(
         eventOptions.count,
       );
+    });
+
+    it('calls the `write` crew function to save the updated position', async () => {
+      const POSITION = 23;
+      const options = getOptions({
+        handlers: { VideoViewed: jest.fn() },
+      });
+      const eventOptions = {
+        streamName: options.streamName,
+        count: 3,
+        startPosition: POSITION + 1,
+        eventType: 'VideoViewed',
+      };
+      const events = generateMockEvents(eventOptions);
+      const crew = getCrew({
+        read: jest.fn().mockResolvedValue(events),
+        readLastMessage: jest
+          .fn()
+          .mockReturnValue({ data: { position: POSITION } }),
+      });
+      const createSubscription = createSubscriptionFactory(crew);
+      const subscription = createSubscription(options);
+
+      // Start polling in the background, wait, and stop
+      void subscription.start();
+      await sleep(50);
+      subscription.stop();
+
+      expect(crew.write).toHaveBeenCalledTimes(1);
+
+      const args = crew.write.mock.calls[0];
+      expect(args[0]).toEqual(`subscriberPosition-${options.subscriberId}`);
+      expect(args[1]).toMatchObject({
+        id: expect.any(String),
+        type: 'Read',
+        data: { position: POSITION + events.length },
+      });
     });
   });
 });
