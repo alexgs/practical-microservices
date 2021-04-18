@@ -60,6 +60,29 @@ describe('`ReaderFactory` module', () => {
         expect(args[1]).toEqual([streamName, fromPosition, maxMessages]);
       });
     });
+
+    describe('function `readLastMessage`', () => {
+      it('queries the database', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const streamName = 'test-stream:name';
+
+        const reader = readerFactory(mockDb);
+        await reader.readLastMessage(streamName);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_LAST_MESSAGE);
+        expect(args[1]).toEqual([streamName]);
+      });
+
+      // eslint-disable-next-line jest/no-disabled-tests
+      it.skip('really does the thing', async () => {
+        const reader = readerFactory(theRealAdapter);
+        const result = await reader.readLastMessage('viewing-1');
+        console.log(result);
+        expect(result).toBeTruthy();
+      });
+    });
   });
 
   describe('Helper functions', () => {

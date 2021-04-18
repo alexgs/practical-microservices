@@ -12,7 +12,7 @@ export interface Reader {
     fromPosition?: number,
     maxMessages?: number,
   ) => Promise<WinterfellEvent[]>;
-  readLastMessage: (streamName: string) => Promise<WinterfellEvent>;
+  readLastMessage: (streamName: string) => Promise<WinterfellEvent | null>;
 }
 
 /** @internal */
@@ -20,6 +20,7 @@ export const SQL = {
   READ_ALL_EVENTS: 'SELECT * FROM messages WHERE global_position > $1 LIMIT $2',
   READ_CATEGORY_STREAM: 'SELECT * FROM get_category_messages($1, $2, $3)',
   READ_ENTITY_STREAM: 'SELECT * FROM get_stream_messages($1, $2, $3)',
+  READ_LAST_MESSAGE: 'SELECT * FROM get_last_stream_message($1)',
 };
 
 /** @internal */
@@ -83,7 +84,15 @@ export function readerFactory(pg: PgClient): Reader {
 
   async function readLastMessage(
     streamName: string,
-  ): Promise<WinterfellEvent> {}
+  ): Promise<WinterfellEvent | null> {
+    const result = await pg.query<WinterfellEvent>(SQL.READ_LAST_MESSAGE, [
+      streamName,
+    ]);
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    }
+    return null;
+  }
 
   return {
     read,
