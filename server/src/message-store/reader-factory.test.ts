@@ -4,7 +4,12 @@
 
 import { pg as theRealAdapter } from '../../lib';
 
-import { readAllEvents, SQL } from './reader-factory';
+import {
+  SQL,
+  readAllEvents,
+  readCategoryStream,
+  readEntityStream,
+} from './reader-factory';
 
 describe('`ReaderFactory` module', () => {
   describe('Helper functions', () => {
@@ -27,6 +32,38 @@ describe('`ReaderFactory` module', () => {
         const result = await readAllEvents(theRealAdapter);
         console.log(result);
         expect(result.length).toBeGreaterThan(0);
+      });
+    });
+
+    describe('`readCategoryStream`', () => {
+      it('queries the database', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const fromPosition = 11;
+        const maxMessages = 15;
+        const streamName = 'videoViewed';
+
+        await readCategoryStream(mockDb, streamName, fromPosition, maxMessages);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_CATEGORY_STREAM);
+        expect(args[1]).toEqual([streamName, fromPosition, maxMessages]);
+      });
+    });
+
+    describe('`readEntityStream`', () => {
+      it('queries the database', async () => {
+        const mockDb = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+        const fromPosition = 11;
+        const maxMessages = 15;
+        const streamName = 'videoViewed-1';
+
+        await readEntityStream(mockDb, streamName, fromPosition, maxMessages);
+        expect(mockDb.query).toHaveBeenCalledTimes(1);
+
+        const args = mockDb.query.mock.calls[0];
+        expect(args[0]).toEqual(SQL.READ_ENTITY_STREAM);
+        expect(args[1]).toEqual([streamName, fromPosition, maxMessages]);
       });
     });
   });

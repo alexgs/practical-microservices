@@ -18,6 +18,8 @@ export interface Reader {
 /** @internal */
 export const SQL = {
   READ_ALL_EVENTS: 'SELECT * FROM messages WHERE global_position > $1 LIMIT $2',
+  READ_CATEGORY_STREAM: 'SELECT * FROM get_category_messages($1, $2, $3)',
+  READ_ENTITY_STREAM: 'SELECT * FROM get_stream_messages($1, $2, $3)',
 };
 
 /** @internal */
@@ -27,6 +29,36 @@ export async function readAllEvents(
   maxMessages = 1000,
 ): Promise<WinterfellEvent[]> {
   const result = await pg.query<WinterfellEvent>(SQL.READ_ALL_EVENTS, [
+    fromPosition,
+    maxMessages,
+  ]);
+  return result.rows;
+}
+
+/** @internal */
+export async function readCategoryStream(
+  pg: PgClient,
+  streamName: string,
+  fromPosition = 0,
+  maxMessages = 1000,
+): Promise<WinterfellEvent[]> {
+  const result = await pg.query<WinterfellEvent>(SQL.READ_CATEGORY_STREAM, [
+    streamName,
+    fromPosition,
+    maxMessages,
+  ]);
+  return result.rows;
+}
+
+/** @internal */
+export async function readEntityStream(
+  pg: PgClient,
+  streamName: string,
+  fromPosition = 0,
+  maxMessages = 1000,
+): Promise<WinterfellEvent[]> {
+  const result = await pg.query<WinterfellEvent>(SQL.READ_ENTITY_STREAM, [
+    streamName,
     fromPosition,
     maxMessages,
   ]);
