@@ -21,7 +21,8 @@
     "prettier:fix": "prettier --write .",
     "seed": "prisma db seed --preview-feature",
     "studio": "prisma studio",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@hapi/hapi": "^20.1.2",
