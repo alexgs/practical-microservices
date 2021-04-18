@@ -27,7 +27,7 @@ export interface FactoryCrew {
   write: WriteFn;
 }
 
-export type MessageHandler = (event: WinterfellEvent) => Promise<void>;
+export type MessageHandler = (event: WinterfellEvent) => Promise<unknown>;
 
 export interface Subscription extends Startable {
   // "Hidden" methods exported for testing

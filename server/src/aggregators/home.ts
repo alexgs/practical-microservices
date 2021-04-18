@@ -47,7 +47,7 @@ function createQueries(db: DbClient) {
       // do this without executing the raw query
       const query = `
         UPDATE
-          Pages
+          "Pages"
         SET
           data = jsonb_set(
             jsonb_set(
@@ -60,7 +60,7 @@ function createQueries(db: DbClient) {
           )
         WHERE
           name = '${PAGES.HOME}' AND
-          (data ->>'lastViewProcessed')::int < ${event.global_position}
+          (data ->> 'lastViewProcessed')::int < ${event.global_position}
       `;
       return db.$executeRaw(query);
     },
@@ -85,7 +85,8 @@ export function createAggregator(
 
   async function start() {
     await init();
-    await subscription.start();
+    // Start the subscription in the background
+    void subscription.start();
   }
 
   return {

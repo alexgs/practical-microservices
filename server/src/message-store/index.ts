@@ -12,14 +12,14 @@ import {
 import { readerFactory } from './reader-factory';
 import { WriteFn, writeFactory } from './write-factory';
 
-export type JsonB = Record<string, unknown>;
-
 export interface EventInput {
   id: string;
   type: string;
   metadata?: WinterfellEventMetadata;
   data: WinterfellEventData;
 }
+
+export type JsonB = Record<string, unknown>;
 
 export interface MessageStore {
   createSubscription: (options: CreateSubscriptionOptions) => Subscription;

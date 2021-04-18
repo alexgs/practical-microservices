@@ -4,7 +4,7 @@
 
 import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
-import { v4 as getUuid } from 'uuid';
+import { v4 as generateUuid } from 'uuid';
 
 import { db, pg } from '../lib';
 
@@ -34,7 +34,7 @@ const plugin: Hapi.Plugin<null> = {
   // eslint-disable-next-line @typescript-eslint/require-await
   register: async (server) => {
     server.ext('onRequest', function (request: WinterfellRequest, h) {
-      request.app.traceId = getUuid();
+      request.app.traceId = generateUuid();
       return h.continue;
     });
   },
@@ -100,7 +100,7 @@ const main = async () => {
       const videoId = request.params.videoId as string;
 
       const event = {
-        id: getUuid(),
+        id: generateUuid(),
         type: 'VideoViewed', // TODO Standardize these with a global constant
         metadata: {
           traceId,
