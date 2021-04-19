@@ -4,9 +4,16 @@
 
 import Hapi from '@hapi/hapi';
 import * as env from 'env-var';
-import { v4 as getUuid } from 'uuid';
+import { v4 as generateUuid } from 'uuid';
 
-import { createMessageStore, db, pg } from '../lib';
+import { db, pg } from '../lib';
+
+import {
+  PAGES,
+  createHomeAggregator,
+} from './aggregators';
+import { createMessageStore } from './message-store';
+import { Startable } from './types';
 
 const PORT = env.get('SERVER_PORT').required().asPortNumber();
 
@@ -27,7 +34,7 @@ const plugin: Hapi.Plugin<null> = {
   // eslint-disable-next-line @typescript-eslint/require-await
   register: async (server) => {
     server.ext('onRequest', function (request: WinterfellRequest, h) {
-      request.app.traceId = getUuid();
+      request.app.traceId = generateUuid();
       return h.continue;
     });
   },
@@ -40,11 +47,30 @@ const main = async () => {
 
   await server.register(plugin);
 
+  const homeAggregator = createHomeAggregator(db, messageStore);
+  const aggregators: Startable[] = [homeAggregator];
+  for (const ag of aggregators) {
+    await ag.start();
+  }
+
   server.route({
     method: 'GET',
     path: '/',
     handler: () => {
       return 'Hello Winterfell!';
+    },
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/api/pages/home',
+    handler: async (request: WinterfellRequest, h) => {
+      const data = await db.pages.findFirst({
+        where: { name: PAGES.HOME },
+      });
+      return h
+        .response({ data })
+        .header('X-Trace-ID', request.app.traceId ?? 'missing-trace-id-0002');
     },
   });
 
@@ -74,7 +100,7 @@ const main = async () => {
       const videoId = request.params.videoId as string;
 
       const event = {
-        id: getUuid(),
+        id: generateUuid(),
         type: 'VideoViewed', // TODO Standardize these with a global constant
         metadata: {
           traceId,
@@ -88,7 +114,9 @@ const main = async () => {
       const streamName = `viewing-${videoId}`;
       // Closing over the messageStore like this is a form of dependency
       // injection, albeit a very simple, cheap, and brittle one
-      await messageStore.write(streamName, event).catch(error => console.log(error));
+      await messageStore
+        .write(streamName, event)
+        .catch((error) => console.log(error));
 
       return { videoId }; // TODO What's an appropriate response payload?
     },
