@@ -1,33 +1,33 @@
 /*
- * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ * Copyright 2021-present Phillip Gates-Shannon. All rights reserved. Licensed
+ * under the Open Software License version 3.0.
  */
 
-// TypeScript support for `node-postgres` seems to be kind of crap (or uses a
-//   lot of generics), so turn off a bunch of warnings in this file.
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { Client, QueryResult } from 'pg';
 
-import { PrismaClient } from '@prisma/client';
-import * as env from 'env-var';
-import { Pool, QueryResult } from 'pg';
+class DatabaseClient {
+  private client: Client;
+  private isConnected: boolean;
 
-// --- POSTGRESQL ---
+  constructor(connectionString: string) {
+    this.client = new Client({ connectionString });
+    this.isConnected = false;
+  }
 
-const MESSAGE_STORE_URL = env.get('MESSAGE_STORE_URL').required().asString();
-const postgresPool = new Pool({ connectionString: MESSAGE_STORE_URL });
+  async query<R>(text: string, params: unknown[]): Promise<QueryResult<R>> {
+    if (!this.isConnected) {
+      await this.client.connect();
+      await this.client.query('SET search_path = message_store, public');
+      this.isConnected = true;
+    }
 
-// eslint-disable-next-line @typescript-eslint/require-await
-async function query<R>(text: string, params: unknown[]): Promise<QueryResult<R>> {
-  return postgresPool.query<R>(text, params);
+    return this.client.query(text, params);
+  }
+
+  async stop(): Promise<null> {
+    await this.client.end();
+    return null;
+  }
 }
 
-export const pg = { query };
-export type PgClient = typeof pg;
-
-// --- PRISMA ---
-
-export type DbClient = PrismaClient;
-
-export const db = new PrismaClient();
+export { DatabaseClient };
