@@ -26,6 +26,7 @@ services:
       - app-network
     environment:
       - DATABASE_URL
+      - EXPRESS_PORT
       - MESSAGE_STORE_URL
       - SERVER_PORT
     command: /home/node/.volta/bin/npm run dev
