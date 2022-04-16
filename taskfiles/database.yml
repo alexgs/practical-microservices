@@ -15,6 +15,13 @@ tasks:
       - docker exec -it database /bin/sh
     desc: Open a shell in the {{.DATABASE_SERVICE_NAME|title}} container
 
+  # - HIDDEN COMMANDS -
+
+  # Connect to the Postgres cluster **AS THE ADMIN USER** with the `psql` tool
+  psql-admin:
+    cmds:
+      - "psql -h localhost -p $DATABASE_PORT -U $DATABASE_ADMIN_USER -d $DATABASE_NAME"
+
   # - HIDDEN & DANGEROUS COMMANDS -
 
   # Initialize the __host__ Postgres data directory
@@ -38,8 +45,8 @@ tasks:
     -e POSTGRES_DB=$DATABASE_NAME
     -e POSTGRES_HOST_AUTH_METHOD=scram-sha-256
     -e POSTGRES_INITDB_ARGS="--auth=scram-sha-256"
-    -e POSTGRES_PASSWORD=$DATABASE_PASSWORD
-    -e POSTGRES_USER=$DATABASE_USER
+    -e POSTGRES_PASSWORD=$DATABASE_ADMIN_PASSWORD
+    -e POSTGRES_USER=$DATABASE_ADMIN_USER
     -v $DATABASE_HOST_DIRECTORY:/var/lib/postgresql/data
     postgres:13-alpine
   private:initialize-2-sleep: sleep 15s

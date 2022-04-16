@@ -28,7 +28,7 @@ services:
       - DATABASE_URL
       - MESSAGE_STORE_URL
       - SERVER_PORT
-    command: npm run dev
+    command: /home/node/.volta/bin/npm run dev
 
 #  webapp:
 #    image: alexgs99/node:2

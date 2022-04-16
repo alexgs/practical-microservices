@@ -7,7 +7,7 @@ includes:
 dotenv: ['.env']
 
 vars:
-  COMPOSE: docker-compose
+  COMPOSE: 'docker compose'
   NPM_EXEC_PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games'
 
   NPM: "PATH={{.NPM_EXEC_PATH}} npm"
