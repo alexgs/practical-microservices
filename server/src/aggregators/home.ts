@@ -65,11 +65,11 @@ export function createAggregator(
 ): Aggregator {
   const queries = createQueries(db);
   const handlers = createMessageHandlers(queries);
-  // const subscription = messageStore.createSubscription({
-  //   streamName: 'viewing',
-  //   handlers,
-  //   subscriberId: 'aggregators:home-page',
-  // });
+  const subscription = messageStore.createSubscription({
+    streamName: 'viewing',
+    handlers,
+    subscriberId: 'aggregators:home-page',
+  });
 
   async function init() {
     return queries.createHomePage();
@@ -77,8 +77,7 @@ export function createAggregator(
 
   async function start() {
     await init();
-    // Start the subscription in the background
-    // void subscription.start();
+    await subscription.start();
   }
 
   return {

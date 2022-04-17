@@ -5,15 +5,23 @@
 
 import { DatabaseWriter } from '../../lib';
 
+import {
+  createSubscriptionFactory,
+  CreateSubscriptionFn,
+} from './create-subscription-factory';
 import { writerFactory, WriteFn } from './writer-factory';
 
 class MessageStore {
   private db: DatabaseWriter;
 
   public write: WriteFn;
+  public createSubscription: CreateSubscriptionFn;
 
   constructor(database: DatabaseWriter) {
     this.db = database;
+
+    // @ts-ignore -- until everything is implemented
+    this.createSubscription = createSubscriptionFactory({});
     this.write = writerFactory(database);
   }
 }

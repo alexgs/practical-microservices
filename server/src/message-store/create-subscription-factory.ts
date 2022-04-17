@@ -11,6 +11,8 @@ import { EventInput, WinterfellEvent } from './index';
 import { Reader } from './reader-factory';
 import { WriteFn, WriteResult } from './writer-factory';
 
+export type CreateSubscriptionFn = ReturnType<typeof createSubscriptionFactory>;
+
 export interface CreateSubscriptionOptions {
   handlers: Record<string, MessageHandler>;
   messagesPerTick?: number;
