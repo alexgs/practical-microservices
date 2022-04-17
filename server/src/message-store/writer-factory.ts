@@ -1,10 +1,11 @@
 /*
- * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ * Copyright 2021-present Phillip Gates-Shannon. All rights reserved. Licensed
+ * under the Open Software License version 3.0.
  */
 
 import { QueryResult } from 'pg';
 
-import { PgClient } from '../../lib';
+import { DatabaseClient } from '../../lib';
 
 import { EventInput, JsonB } from './index';
 
@@ -20,7 +21,7 @@ type WriteValues = [string, string, string, JsonB, JsonB | null, number | null];
 
 const SQL_WRITE_FN = 'SELECT write_message($1, $2, $3, $4, $5, $6)';
 
-export function writeFactory(pg: PgClient): WriteFn {
+export function writerFactory(db: DatabaseClient): WriteFn {
   return async function write(
     streamName: string,
     message: EventInput,
@@ -34,6 +35,7 @@ export function writeFactory(pg: PgClient): WriteFn {
       message.metadata ?? null,
       expectedVersion,
     ];
-    return pg.query<{write_message: number}>(SQL_WRITE_FN, values);
+    return db.query<{write_message: number}>(SQL_WRITE_FN, values);
+    // TODO Add error handling (see https://learning.oreilly.com/library/view/practical-microservices/9781680507782/f_0051.xhtml)
   };
 }

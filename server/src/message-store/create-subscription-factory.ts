@@ -9,7 +9,7 @@ import { Startable } from '../types';
 
 import { EventInput, WinterfellEvent } from './index';
 import { Reader } from './reader-factory';
-import { WriteFn, WriteResult } from './write-factory';
+import { WriteFn, WriteResult } from './writer-factory';
 
 export interface CreateSubscriptionOptions {
   handlers: Record<string, MessageHandler>;
