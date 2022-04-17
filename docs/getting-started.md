@@ -56,5 +56,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $DATABASE_USER;
 ALTER ROLE $DATABASE_USER WITH CREATEDB;
 ```
 
-7. Use `\q` to exit the client.
-8. Run `rm ~/.psql_history` to clear the client history (which contains the `$DATABASE_PASSWORD`).
+12. Use `\q` to exit the client.
+13. Run `rm ~/.psql_history` to clear the client history (which contains the `$DATABASE_PASSWORD`).
+14. Download the source files from the [book's website][3] and copy the files from `video-tutorials/src/app/public` to this projects `server/public` directory.
+
+[3]: https://pragprog.com/titles/egmicro/practical-microservices/

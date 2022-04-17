@@ -33,3 +33,4 @@ host/database/message-db/
 *.tar.gz
 
 server/temp
+server/public/

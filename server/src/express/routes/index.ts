@@ -7,8 +7,8 @@ import { Express } from 'express';
 
 import { Config } from '../../config';
 
+import { createHomepageApp } from './home';
+
 export function mountRoutes(app: Express, config: Config): void {
-  app.get('/', (req, res) => {
-    res.send('Hello World!');
-  });
+  app.get('/', createHomepageApp(config).router);
 }
