@@ -1,8 +1,9 @@
 /*
- * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ * Copyright 2021-present Phillip Gates-Shannon. All rights reserved. Licensed
+ * under the Open Software License version 3.0.
  */
 
-import { DbClient } from '../../lib';
+import { DatabaseWriter } from '../../lib';
 import { MessageStore, WinterfellEvent } from '../message-store';
 
 import { PAGES, Aggregator } from './index';
@@ -16,7 +17,7 @@ function createMessageHandlers(queries: ReturnType<typeof createQueries>) {
   };
 }
 
-function createQueries(db: DbClient) {
+function createQueries(db: DatabaseWriter) {
   return {
     createHomePage: async () => {
       try {
@@ -68,7 +69,7 @@ function createQueries(db: DbClient) {
 }
 
 export function createAggregator(
-  db: DbClient,
+  db: DatabaseWriter,
   messageStore: MessageStore,
 ): Aggregator {
   const queries = createQueries(db);

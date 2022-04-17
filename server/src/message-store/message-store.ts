@@ -3,16 +3,16 @@
  * under the Open Software License version 3.0.
  */
 
-import { DatabaseClient } from '../../lib';
+import { DatabaseWriter } from '../../lib';
 
 import { writerFactory, WriteFn } from './writer-factory';
 
 class MessageStore {
-  private db: DatabaseClient;
+  private db: DatabaseWriter;
 
   public write: WriteFn;
 
-  constructor(database: DatabaseClient) {
+  constructor(database: DatabaseWriter) {
     this.db = database;
     this.write = writerFactory(database);
   }
