@@ -5,7 +5,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { WinterfellRequest } from './types';
+import { WinterfellRequest } from '../types';
 
 export function lastResortErrorHandler(
   err: Error,

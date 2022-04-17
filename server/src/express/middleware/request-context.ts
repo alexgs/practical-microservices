@@ -6,7 +6,7 @@
 import { NextFunction, Response } from 'express';
 import { v4 as generateUuid } from 'uuid';
 
-import { WinterfellRequest } from './types';
+import { WinterfellRequest } from '../types';
 
 export function addRequestContext(req: WinterfellRequest, res: Response, next: NextFunction): void {
   req.context = {

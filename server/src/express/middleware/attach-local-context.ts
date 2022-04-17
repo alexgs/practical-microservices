@@ -5,7 +5,7 @@
 
 import { NextFunction, Response } from 'express';
 
-import { WinterfellRequest } from './types';
+import { WinterfellRequest } from '../types';
 
 export function attachLocalContext(req: WinterfellRequest, res: Response, next: NextFunction): void {
   res.locals.context = req.context ?? {};

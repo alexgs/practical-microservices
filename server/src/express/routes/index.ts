@@ -5,7 +5,7 @@
 
 import { Express } from 'express';
 
-import { Config } from '../config';
+import { Config } from '../../config';
 
 export function mountRoutes(app: Express, config: Config): void {
   app.get('/', (req, res) => {
