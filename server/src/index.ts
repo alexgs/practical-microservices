@@ -3,21 +3,14 @@
  * under the Open Software License version 3.0.
  */
 
-import { DatabaseWriter, createDatabaseReader } from '../lib';
-
 import { createHomeAggregator } from './aggregators';
 import { getConfig } from './config';
 import { createExpressApp } from './express';
-import { MessageStore } from './message-store';
 import { Startable } from './types';
 
 async function main() {
-  const config = getConfig();
-  const dbReader = await createDatabaseReader(config.env.MESSAGE_STORE_URL);
-  const dbWriter = new DatabaseWriter(config.env.MESSAGE_STORE_URL);
-  const messageStore = new MessageStore(dbWriter);
-
-  const homeAggregator = createHomeAggregator(dbReader, messageStore);
+  const config = await getConfig();
+  const homeAggregator = createHomeAggregator(config);
   const aggregators: Startable[] = [homeAggregator];
   for (const ag of aggregators) {
     await ag.start();
