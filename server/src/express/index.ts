@@ -9,6 +9,7 @@ import { join } from 'path';
 import { Config } from '../config';
 
 import { mountMiddleware } from './middleware';
+import { mountRoutes } from './routes';
 
 export function createExpressApp(config: Config): Express {
   const app = express();
@@ -18,7 +19,7 @@ export function createExpressApp(config: Config): Express {
   app.set('view engine', 'pug');
 
   mountMiddleware(app);
-  // mountRoutes(app, config) // (5)
+  mountRoutes(app, config);
 
   return app;
 }

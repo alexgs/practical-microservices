@@ -25,10 +25,6 @@ async function main() {
 
   const app = createExpressApp(config);
 
-  app.get('/', (req, res) => {
-    res.send('Hello World!');
-  });
-
   app.listen(config.env.PORT, () => {
     console.log(`Example app listening at http://localhost:${config.env.PORT}`);
   });

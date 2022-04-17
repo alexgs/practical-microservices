@@ -15,13 +15,13 @@ class MessageStore {
   private db: DatabaseWriter;
 
   public write: WriteFn;
-  public createSubscription: CreateSubscriptionFn;
+  // public createSubscription: CreateSubscriptionFn;
 
   constructor(database: DatabaseWriter) {
     this.db = database;
 
     // @ts-ignore -- until everything is implemented
-    this.createSubscription = createSubscriptionFactory({});
+    // this.createSubscription = createSubscriptionFactory({});
     this.write = writerFactory(database);
   }
 }
