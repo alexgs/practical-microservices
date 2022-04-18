@@ -10,6 +10,7 @@ import { WinterfellRequest } from '../types';
 
 function createHandlers() {
   function home(req: WinterfellRequest, res: Response, next: NextFunction) {
+    // TODO Connect a query to make this number reflect events in the database
     res.render('express/templates/home', { videosWatched: 11 });
   }
 

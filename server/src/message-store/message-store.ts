@@ -5,11 +5,11 @@
 
 import { MessageDatabase } from '../../lib';
 
+import { readerFactory } from './reader-factory';
 import {
   createSubscriptionFactory,
   CreateSubscriptionFn,
 } from './subscription-factory';
-import { readerFactory } from './reader-factory';
 import { Reader, WriteFn } from './types';
 import { writerFactory } from './writer-factory';
 

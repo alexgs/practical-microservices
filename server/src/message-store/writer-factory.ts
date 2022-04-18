@@ -12,7 +12,7 @@ import { WriteFn } from './types';
 
 type WriteValues = [string, string, string, JsonB, JsonB | null, number | null];
 
-const SQL_WRITE_FN = 'SELECT write_message($1, $2, $3, $4, $5, $6)';
+const SQL_WRITE_FN = 'SELECT message_store.write_message($1, $2, $3, $4, $5, $6)';
 
 export function writerFactory(db: MessageDatabase): WriteFn {
   // TODO Refactor this so there's a `writer` object, so the syntax here parallels what's in `reader-factory`

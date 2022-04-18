@@ -54,7 +54,19 @@ GRANT ALL ON ALL TABLES IN SCHEMA public TO $DATABASE_USER;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $DATABASE_USER;
 
 ALTER ROLE $DATABASE_USER WITH CREATEDB;
+
+REVOKE ALL ON ALL TABLES IN SCHEMA message_store FROM PUBLIC;
+
+GRANT ALL ON SCHEMA message_store TO $DATABASE_USER;
+
+GRANT ALL ON ALL SEQUENCES IN SCHEMA message_store TO $DATABASE_USER;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA message_store GRANT ALL ON SEQUENCES TO $DATABASE_USER;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA message_store GRANT ALL ON TABLES TO $DATABASE_USER;
 ```
+
+Note: To be honest, I'm not sure exactly which of the `SCHEMA message_store` statements are critical. Some of them may be unnecessary. :shrug:
 
 12. Use `\q` to exit the client.
 13. Run `rm ~/.psql_history` to clear the client history (which contains the `$DATABASE_PASSWORD`).
