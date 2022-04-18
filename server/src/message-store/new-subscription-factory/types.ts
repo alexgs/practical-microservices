@@ -8,7 +8,7 @@ import { QueryResult } from 'pg';
 import { Startable } from '../../types';
 import { Reader, WinterfellEvent, WriteFn } from '../types';
 
-export type CreateSubscriptionFn = (crew: FactoryCrew) => (options: CreateSubscriptionOptions) => Subscription;
+export type CreateSubscriptionFn = (options: CreateSubscriptionOptions) => Subscription;
 
 export interface CreateSubscriptionOptions {
   handlers: Record<string, MessageHandler>;

@@ -8,22 +8,33 @@ import { MessageDatabase } from '../../lib';
 import {
   createSubscriptionFactory,
   CreateSubscriptionFn,
-} from './create-subscription-factory';
-import { WriteFn } from './types';
+} from './new-subscription-factory';
+import { readerFactory } from './reader-factory';
+import { Reader, WriteFn } from './types';
 import { writerFactory } from './writer-factory';
 
+// TODO Refactor to factory pattern
 class MessageStore {
   private db: MessageDatabase;
 
   public write: WriteFn;
-  // public createSubscription: CreateSubscriptionFn;
+  public createSubscription: CreateSubscriptionFn;
+  public read: Reader['read'];
+  public readLastMessage: Reader['readLastMessage'];
 
   constructor(database: MessageDatabase) {
     this.db = database;
+    const reader = readerFactory(database);
 
-    // @ts-ignore -- until everything is implemented
-    // this.createSubscription = createSubscriptionFactory({});
+    this.read = reader.read;
+    this.readLastMessage = reader.readLastMessage;
     this.write = writerFactory(database);
+
+    this.createSubscription = createSubscriptionFactory({
+      read: this.read,
+      readLastMessage: this.readLastMessage,
+      write: this.write,
+    });
   }
 }
 
