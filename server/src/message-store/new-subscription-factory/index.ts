@@ -3,6 +3,7 @@
  * under the Open Software License version 3.0.
  */
 
+import { sleep } from '../../../lib';
 import { WinterfellEvent } from '../types';
 
 import { getPosition } from './get-position';
@@ -52,15 +53,26 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
       state.currentPosition = await getPosition(crew, finalOptions, state);
     }
 
-    async function poll(): Promise<void> {
-      return Promise.resolve();
+    async function poll() {
+      await loadPosition();
+      while (state.continuePolling) {
+        const messagesProcessed = await tick();
+        if (messagesProcessed === 0) {
+          await sleep(finalOptions.tickIntervalMs);
+        }
+      }
     }
 
     async function processBatchOfMessages(messages: WinterfellEvent[]): Promise<number> {
       for (let i = 0; i < messages.length; i++) {
         const message = messages[i];
-        await handleMessage(message);
-        await updateReadPosition(message.global_position);
+        try {
+          await handleMessage(message);
+          await updateReadPosition(message.global_position);
+        } catch (e) {
+          console.error(`Error processing: ${options.subscriberId} | ${message.id} | `, e);
+          throw e; // Re-throw so we break the chain
+        }
       }
       return messages.length;
     }
@@ -70,11 +82,23 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
     }
 
     async function start(): Promise<void> {
-      return Promise.resolve(undefined);
+      console.log(`Started ${finalOptions.subscriberId}`);
+      return poll();
     }
 
-    async function stop(): Promise<void> {
-      return Promise.resolve(undefined);
+    function stop() {
+      console.log(`Stopped ${finalOptions.subscriberId}`);
+      state.continuePolling = false;
+    }
+
+    async function tick(): Promise<number | void> {
+      try {
+        const batch = await getNextBatchOfMessages();
+        return processBatchOfMessages(batch);
+      } catch (e) {
+        console.error('Error processing batch:', e);
+        stop();
+      }
     }
 
     // TODO Add tests for this function
@@ -90,6 +114,7 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
     }
 
     return {
+      // TODO I'm not sure why this exposes anything other than start and stop
       loadPosition,
       savePosition,
       start,
