@@ -3,19 +3,32 @@
  * under the Open Software License version 3.0.
  */
 
+import { getPosition as getPositionImpl } from './get-position';
 import {
   CreateSubscriptionOptions,
   FactoryCrew,
-  Subscription, WriteResult,
+  FinalOptions,
+  Subscription,
+  WriteResult,
 } from './types';
 
 export function createSubscriptionFactory(crew: FactoryCrew) {
   return function createSubscription(
     options: CreateSubscriptionOptions,
   ): Subscription {
+    const subscriberStreamName = `subscriberPosition-${options.subscriberId}`;
+    let continuePolling = true;
+
+    const finalOptions: FinalOptions = {
+      messagesPerTick: 100,
+      positionUpdateIntervalMs: 100,
+      // originStreamName: null,
+      tickIntervalMs: 100,
+      ...options,
+    };
 
     async function getPosition(): Promise<number> {
-      return Promise.resolve(0);
+      return getPositionImpl(crew, subscriberStreamName);
     }
 
     async function poll(): Promise<void> {
