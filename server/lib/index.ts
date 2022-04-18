@@ -3,6 +3,6 @@
  *  under the Open Software License version 3.0.
  */
 
-export * from './database-writer';
-export * from './database-reader';
+export * from './message-database';
 export * from './utils';
+export * from './view-database';

@@ -1,19 +1,13 @@
 /*
- * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ * Copyright 2021-present Phillip Gates-Shannon. All rights reserved. Licensed
+ * under the Open Software License version 3.0.
  */
 
-import { PgClient } from '../../lib';
+import { MessageDatabase } from '../../../lib';
+import { ALL_EVENTS_STREAM, isEntityStream } from '../index';
+import { WinterfellEvent, Reader } from '../types';
 
-import { ALL_EVENTS_STREAM, WinterfellEvent, isEntityStream } from './index';
-
-export interface Reader {
-  read: (
-    streamName: string,
-    fromPosition?: number,
-    maxMessages?: number,
-  ) => Promise<WinterfellEvent[]>;
-  readLastMessage: (streamName: string) => Promise<WinterfellEvent | null>;
-}
+// TODO Refactor so the worker functions and their tests are in separate files
 
 /** @internal */
 export const SQL = {
@@ -25,7 +19,7 @@ export const SQL = {
 
 /** @internal */
 export async function readAllEvents(
-  pg: PgClient,
+  pg: MessageDatabase,
   fromPosition = 0,
   maxMessages = 1000,
 ): Promise<WinterfellEvent[]> {
@@ -38,7 +32,7 @@ export async function readAllEvents(
 
 /** @internal */
 export async function readCategoryStream(
-  pg: PgClient,
+  pg: MessageDatabase,
   streamName: string,
   fromPosition = 0,
   maxMessages = 1000,
@@ -53,7 +47,7 @@ export async function readCategoryStream(
 
 /** @internal */
 export async function readEntityStream(
-  pg: PgClient,
+  pg: MessageDatabase,
   streamName: string,
   fromPosition = 0,
   maxMessages = 1000,
@@ -67,7 +61,7 @@ export async function readEntityStream(
 }
 
 /** @public */
-export function readerFactory(pg: PgClient): Reader {
+export function readerFactory(pg: MessageDatabase): Reader {
   async function read(
     streamName: string,
     fromPosition = 0,

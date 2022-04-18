@@ -5,7 +5,7 @@
 
 import { Knex } from 'knex';
 
-import { DatabaseReader } from '../../lib';
+import { ViewDatabase } from '../../lib';
 import { Config } from '../config';
 import { WinterfellEvent } from '../message-store';
 
@@ -20,7 +20,7 @@ function createMessageHandlers(queries: ReturnType<typeof createQueries>) {
   };
 }
 
-function createQueries(db: DatabaseReader) {
+function createQueries(db: ViewDatabase) {
   return {
     createHomePage: async () => {
       const initialData = {
@@ -61,7 +61,7 @@ function createQueries(db: DatabaseReader) {
 }
 
 export function createAggregator(config: Config): Aggregator {
-  const queries = createQueries(config.dbReader);
+  const queries = createQueries(config.viewDb);
   const handlers = createMessageHandlers(queries);
   // const subscription = messageStore.createSubscription({
   //   streamName: 'viewing',

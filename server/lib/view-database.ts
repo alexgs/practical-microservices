@@ -5,16 +5,14 @@
 
 import knex, { Knex } from 'knex';
 
-type DatabaseReader = Knex;
+export type ViewDatabase = Knex;
 
-async function createDatabaseReader(
+export async function createViewDbClient(
   connectionString: string,
   migrationsTable = 'knex_migrations'
-): Promise<DatabaseReader> {
+): Promise<ViewDatabase> {
   const client = knex(connectionString);
   await client.migrate.latest({ tableName: migrationsTable });
 
   return client;
 }
-
-export { DatabaseReader, createDatabaseReader };
