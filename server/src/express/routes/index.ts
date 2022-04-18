@@ -8,7 +8,9 @@ import { Express } from 'express';
 import { Config } from '../../config';
 
 import { createHomepageApp } from './home';
+import { createRecordViewings } from './record-viewings';
 
 export function mountRoutes(app: Express, config: Config): void {
   app.get('/', createHomepageApp(config).router);
+  app.use('/record-viewing', createRecordViewings(config).router);
 }

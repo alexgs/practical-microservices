@@ -34,7 +34,7 @@ export interface WinterfellEvent extends EventInput {
 
 export interface WinterfellEventMetadata extends JsonB {
   traceId: string;
-  userId: number;
+  userId: string;
 }
 
 export type WriteFn = (
