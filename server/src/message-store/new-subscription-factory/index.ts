@@ -12,6 +12,7 @@ import {
   Subscription,
   WriteResult,
 } from './types';
+import { writePosition } from './write-position';
 
 export function createSubscriptionFactory(crew: FactoryCrew) {
   return function createSubscription(
@@ -41,8 +42,7 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
     }
 
     async function savePosition(position: number): Promise<WriteResult> {
-      // @ts-ignore // TODO
-      return Promise.resolve({});
+      return writePosition(crew, finalOptions, state, position);
     }
 
     async function start(): Promise<void> {
