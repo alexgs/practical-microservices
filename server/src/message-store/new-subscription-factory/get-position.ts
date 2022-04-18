@@ -3,11 +3,11 @@
  * under the Open Software License version 3.0.
  */
 
-import { FactoryCrew, FinalOptions, State } from './types';
+import { FactoryCrew, FinalSubscriptionOptions, State } from './types';
 
 export async function getPosition(
   crew: FactoryCrew,
-  options: FinalOptions,
+  options: FinalSubscriptionOptions,
   state: State,
 ): Promise<number> {
   const message = await crew.readLastMessage(state.subscriberStreamName);

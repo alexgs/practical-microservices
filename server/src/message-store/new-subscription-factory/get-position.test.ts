@@ -6,7 +6,7 @@
 import { MockObject } from '../../types';
 
 import { getPosition } from './get-position';
-import { FactoryCrew, FinalOptions, State } from './types';
+import { FactoryCrew, FinalSubscriptionOptions, State } from './types';
 
 type MockCrew = MockObject<FactoryCrew>;
 
@@ -37,7 +37,7 @@ describe('The `getPosition` function', () => {
         .fn()
         .mockReturnValue({ data: { position: POSITION } }),
     });
-    const options = {} as FinalOptions;
+    const options = {} as FinalSubscriptionOptions;
     const state = getState();
 
     await getPosition(crew, options, state);
@@ -51,7 +51,7 @@ describe('The `getPosition` function', () => {
         .fn()
         .mockReturnValue({ data: { position: POSITION.toString() } }),
     });
-    const options = {} as FinalOptions;
+    const options = {} as FinalSubscriptionOptions;
     const state = getState();
 
     const result = await getPosition(crew, options, state);
@@ -65,7 +65,7 @@ describe('The `getPosition` function', () => {
         .fn()
         .mockReturnValue({ data: { position: POSITION } }),
     });
-    const options = {} as FinalOptions;
+    const options = {} as FinalSubscriptionOptions;
     const state = getState();
 
     const result = await getPosition(crew, options, state);
@@ -78,7 +78,7 @@ describe('The `getPosition` function', () => {
         .fn()
         .mockReturnValue({ data: { otherThing: 'Two' } }),
     });
-    const options = {} as FinalOptions;
+    const options = {} as FinalSubscriptionOptions;
     const state = getState();
 
     const result = await getPosition(crew, options, state);

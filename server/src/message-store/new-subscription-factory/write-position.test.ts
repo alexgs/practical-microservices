@@ -8,7 +8,7 @@ import { MockObject } from '../../types';
 import {
   CreateSubscriptionOptions,
   FactoryCrew,
-  FinalOptions,
+  FinalSubscriptionOptions,
   State,
 } from './types';
 import { writePosition } from './write-position';
@@ -26,7 +26,7 @@ function getCrew(override?: Partial<MockCrew>): MockCrew {
 
 function getOptions(
   override?: Partial<CreateSubscriptionOptions>,
-): FinalOptions {
+): FinalSubscriptionOptions {
   return {
     handlers: {},
     messagesPerTick: 100,

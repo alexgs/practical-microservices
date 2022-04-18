@@ -27,7 +27,7 @@ export interface FactoryCrew {
 }
 
 /** @internal */
-export type FinalOptions = Readonly<Required<CreateSubscriptionOptions>>;
+export type FinalSubscriptionOptions = Readonly<Required<CreateSubscriptionOptions>>;
 
 export type MessageHandler = (event: WinterfellEvent) => Promise<unknown>;
 

@@ -3,11 +3,13 @@
  * under the Open Software License version 3.0.
  */
 
+import { WinterfellEvent } from '../types';
+
 import { getPosition } from './get-position';
 import {
   CreateSubscriptionOptions,
   FactoryCrew,
-  FinalOptions,
+  FinalSubscriptionOptions,
   State,
   Subscription,
   WriteResult,
@@ -25,7 +27,7 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
       subscriberStreamName: `subscriberPosition-${options.subscriberId}`,
     };
 
-    const finalOptions: FinalOptions = {
+    const finalOptions: FinalSubscriptionOptions = {
       messagesPerTick: 100,
       positionUpdateCount: 100,
       // originStreamName: null,
@@ -33,12 +35,34 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
       ...options,
     };
 
+    async function getNextBatchOfMessages() {
+      return crew.read(
+        finalOptions.streamName,
+        state.currentPosition + 1,
+        finalOptions.messagesPerTick,
+      );
+    }
+
+    async function handleMessage(message: WinterfellEvent) {
+      const handler = finalOptions.handlers[message.type] || finalOptions.handlers.$any;
+      return handler ? handler(message) : true;
+    }
+
     async function loadPosition(): Promise<void> {
       state.currentPosition = await getPosition(crew, finalOptions, state);
     }
 
     async function poll(): Promise<void> {
       return Promise.resolve();
+    }
+
+    async function processBatchOfMessages(messages: WinterfellEvent[]): Promise<number> {
+      for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        await handleMessage(message);
+        await updateReadPosition(message.global_position);
+      }
+      return messages.length;
     }
 
     async function savePosition(position: number): Promise<WriteResult> {
