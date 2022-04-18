@@ -10,7 +10,7 @@ import {
   FactoryCrew,
   FinalSubscriptionOptions,
   State,
-} from './types';
+} from './public-types';
 import { writePosition } from './write-position';
 
 type MockCrew = MockObject<FactoryCrew>;

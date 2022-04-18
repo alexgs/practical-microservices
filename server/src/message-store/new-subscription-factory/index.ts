@@ -4,4 +4,4 @@
  */
 
 export { createSubscriptionFactory } from './subscription-factory';
-export * from './types';
+export * from './public-types';

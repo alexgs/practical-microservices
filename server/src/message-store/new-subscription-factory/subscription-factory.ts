@@ -7,14 +7,14 @@ import { sleep } from '../../../lib';
 import { WinterfellEvent } from '../types';
 
 import { getPosition } from './get-position';
+import { FinalSubscriptionOptions } from './private-types';
 import {
   CreateSubscriptionOptions,
   FactoryCrew,
-  FinalSubscriptionOptions,
   State,
   Subscription,
   WriteResult,
-} from './types';
+} from './public-types';
 import { writePosition } from './write-position';
 
 export function createSubscriptionFactory(crew: FactoryCrew) {

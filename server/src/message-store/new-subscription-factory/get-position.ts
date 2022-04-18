@@ -3,7 +3,7 @@
  * under the Open Software License version 3.0.
  */
 
-import { FactoryCrew, FinalSubscriptionOptions, State } from './types';
+import { FactoryCrew, FinalSubscriptionOptions, State } from './public-types';
 
 export async function getPosition(
   crew: FactoryCrew,

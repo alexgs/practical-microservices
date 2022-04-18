@@ -6,7 +6,7 @@
 import { MockObject } from '../../types';
 
 import { getPosition } from './get-position';
-import { FactoryCrew, FinalSubscriptionOptions, State } from './types';
+import { FactoryCrew, FinalSubscriptionOptions, State } from './public-types';
 
 type MockCrew = MockObject<FactoryCrew>;
 

@@ -7,7 +7,7 @@ import { v4 as generateUuid } from 'uuid';
 
 import { EventInput } from '../types';
 
-import { FactoryCrew, FinalSubscriptionOptions, State, WriteResult } from './types';
+import { FactoryCrew, FinalSubscriptionOptions, State, WriteResult } from './public-types';
 
 export async function writePosition(
   crew: FactoryCrew,
