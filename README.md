@@ -10,4 +10,4 @@ Why yes, I have been watching _Game of Thrones_ recently. I know I'm late to thi
 
 ## Copyright
 
-Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+Copyright 2021-22 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.

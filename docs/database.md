@@ -16,3 +16,9 @@ The use of environment variables allows the same configuration options as passin
 [1]: https://www.postgresql.org/docs/current/libpq-envars.html
 [2]: https://github.com/message-db/message-db
 [3]: https://www.pgadmin.org/
+
+## Passwords generally
+
+You can set credentials for `psql` generally with a [`.pgpass` file][4].
+
+[4]: https://www.postgresql.org/docs/13/libpq-pgpass.html

@@ -1,9 +1,13 @@
 /*
- * Copyright 2021 Phillip Gates-Shannon. All rights reserved. Licensed under the Open Software License version 3.0.
+ * Copyright 2021-present Phillip Gates-Shannon. All rights reserved. Licensed
+ * under the Open Software License version 3.0.
  */
 
-import { DbClient } from '../../lib';
-import { MessageStore, WinterfellEvent } from '../message-store';
+import { Knex } from 'knex';
+
+import { ViewDatabase } from '../../lib';
+import { Config } from '../config';
+import { WinterfellEvent } from '../message-store';
 
 import { PAGES, Aggregator } from './index';
 
@@ -16,38 +20,27 @@ function createMessageHandlers(queries: ReturnType<typeof createQueries>) {
   };
 }
 
-function createQueries(db: DbClient) {
+function createQueries(db: ViewDatabase) {
   return {
     createHomePage: async () => {
-      try {
-        await db.pages.create({
-          data: {
-            name: PAGES.HOME,
-            data: {
-              lastViewProcessed: 0,
-              videosViewed: 0,
-            },
-          },
-        });
-      } catch (error) {
-        /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-        // Ignore Prisma errors with these codes; they indicate that the record already exists
-        const constraintErrorCodes = ['P2002', 'P2004'];
-        if (
-          typeof error.code === 'string' &&
-          !constraintErrorCodes.includes(error.code)
-        ) {
-          throw error;
-        }
-        /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-      }
+      const initialData = {
+        pageData: { lastViewProcessed: 0, videosWatched: 0 }
+      } as unknown as Knex.ValueDict;
+
+      const query = `
+        INSERT INTO
+          pages(name, data)
+        VALUES
+          ('home', :pageData)
+        ON CONFLICT DO NOTHING
+      `;
+
+      return db.raw(query, initialData);
     },
     incrementVideosViewed: async (event: WinterfellEvent) => {
-      // Prisma does not currently (v2.20) support all of the JSON functions to
-      // do this without executing the raw query
       const query = `
         UPDATE
-          "Pages"
+          pages
         SET
           data = jsonb_set(
             jsonb_set(
@@ -62,22 +55,19 @@ function createQueries(db: DbClient) {
           name = '${PAGES.HOME}' AND
           (data ->> 'lastViewProcessed')::int < ${event.global_position}
       `;
-      return db.$executeRaw(query);
+      return db.raw(query);
     },
   };
 }
 
-export function createAggregator(
-  db: DbClient,
-  messageStore: MessageStore,
-): Aggregator {
-  const queries = createQueries(db);
+export function createAggregator(config: Config): Aggregator {
+  const queries = createQueries(config.viewDb);
   const handlers = createMessageHandlers(queries);
-  const subscription = messageStore.createSubscription({
-    streamName: 'viewing',
-    handlers,
-    subscriberId: 'aggregators:home-page',
-  });
+  // const subscription = messageStore.createSubscription({
+  //   streamName: 'viewing',
+  //   handlers,
+  //   subscriberId: 'aggregators:home-page',
+  // });
 
   async function init() {
     return queries.createHomePage();
@@ -85,8 +75,7 @@ export function createAggregator(
 
   async function start() {
     await init();
-    // Start the subscription in the background
-    void subscription.start();
+    // await subscription.start();
   }
 
   return {
