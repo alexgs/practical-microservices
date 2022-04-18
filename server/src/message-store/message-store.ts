@@ -3,21 +3,22 @@
  * under the Open Software License version 3.0.
  */
 
-import { DatabaseWriter } from '../../lib';
+import { MessageDatabase } from '../../lib';
 
 import {
   createSubscriptionFactory,
   CreateSubscriptionFn,
 } from './create-subscription-factory';
-import { writerFactory, WriteFn } from './writer-factory';
+import { WriteFn } from './types';
+import { writerFactory } from './writer-factory';
 
 class MessageStore {
-  private db: DatabaseWriter;
+  private db: MessageDatabase;
 
   public write: WriteFn;
   // public createSubscription: CreateSubscriptionFn;
 
-  constructor(database: DatabaseWriter) {
+  constructor(database: MessageDatabase) {
     this.db = database;
 
     // @ts-ignore -- until everything is implemented

@@ -5,7 +5,7 @@
 
 import { Client, QueryResult } from 'pg';
 
-class DatabaseWriter {
+export class MessageDatabase {
   private client: Client;
   private isConnected: boolean;
 
@@ -29,5 +29,3 @@ class DatabaseWriter {
     return null;
   }
 }
-
-export { DatabaseWriter };

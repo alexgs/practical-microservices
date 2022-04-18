@@ -5,7 +5,7 @@
 
 import { QueryResult } from 'pg';
 
-import { DatabaseWriter } from '../../lib';
+import { MessageDatabase } from '../../lib';
 
 import { EventInput, JsonB } from './index';
 import { WriteFn } from './types';
@@ -14,7 +14,7 @@ type WriteValues = [string, string, string, JsonB, JsonB | null, number | null];
 
 const SQL_WRITE_FN = 'SELECT write_message($1, $2, $3, $4, $5, $6)';
 
-export function writerFactory(db: DatabaseWriter): WriteFn {
+export function writerFactory(db: MessageDatabase): WriteFn {
   return async function write(
     streamName: string,
     message: EventInput,
