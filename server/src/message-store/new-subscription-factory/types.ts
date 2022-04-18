@@ -14,7 +14,7 @@ export interface CreateSubscriptionOptions {
   handlers: Record<string, MessageHandler>;
   messagesPerTick?: number;
   // _originStreamName?: string | null;
-  positionUpdateIntervalMs?: number;
+  positionUpdateCount?: number;
   streamName: string;
   subscriberId: string;
   tickIntervalMs?: number;
@@ -31,11 +31,18 @@ export type FinalOptions = Readonly<Required<CreateSubscriptionOptions>>;
 
 export type MessageHandler = (event: WinterfellEvent) => Promise<unknown>;
 
+export interface State {
+  currentPosition: number;
+  messagesSinceLastPositionUpdate: number;
+  continuePolling: boolean;
+  subscriberStreamName: string;
+}
+
 export interface Subscription extends Startable {
-  getPosition: () => Promise<number>;
+  loadPosition: () => Promise<void>;
   poll: () => void;
-  savePosition: (position: number) => WriteResult;
+  savePosition: (position: number) => Promise<WriteResult>;
   stop: () => void;
 }
 
-export type WriteResult = Promise<QueryResult<{write_message: number}>>;
+export type WriteResult = QueryResult<{ write_message: number }>;

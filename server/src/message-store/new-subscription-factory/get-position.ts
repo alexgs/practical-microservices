@@ -3,13 +3,14 @@
  * under the Open Software License version 3.0.
  */
 
-import { FactoryCrew, Subscription } from './types';
+import { FactoryCrew, FinalOptions, State } from './types';
 
 export async function getPosition(
   crew: FactoryCrew,
-  subscriberStreamName: string,
-): ReturnType<Subscription['getPosition']> {
-  const message = await crew.readLastMessage(subscriberStreamName);
+  options: FinalOptions,
+  state: State,
+): Promise<number> {
+  const message = await crew.readLastMessage(state.subscriberStreamName);
   // Read `position` from the event data, not the `position` field (which is the position in the event's stream)
   const position = message?.data?.position;
   if (typeof position === 'string') {

@@ -6,7 +6,7 @@
 import { MockObject } from '../../types';
 
 import { getPosition } from './get-position';
-import { FactoryCrew } from './types';
+import { FactoryCrew, FinalOptions, State } from './types';
 
 type MockCrew = MockObject<FactoryCrew>;
 
@@ -19,55 +19,69 @@ function getCrew(override?: Partial<MockCrew>): MockCrew {
   };
 }
 
+function getState(override?: Partial<State>): State {
+  return {
+    currentPosition: 0,
+    messagesSinceLastPositionUpdate: 0,
+    continuePolling: true,
+    subscriberStreamName: `subscriberPosition-123`,
+    ...override,
+  };
+}
+
 describe('The `getPosition` function', () => {
   it('calls the `readLastMessage` crew function', async () => {
     const POSITION = 17;
-    const config = getCrew({
+    const crew = getCrew({
       readLastMessage: jest
         .fn()
         .mockReturnValue({ data: { position: POSITION } }),
     });
-    const streamName = 'subscriberPosition-123';
+    const options = {} as FinalOptions;
+    const state = getState();
 
-    await getPosition(config, streamName);
-    expect(config.readLastMessage).toHaveBeenCalledTimes(1);
+    await getPosition(crew, options, state);
+    expect(crew.readLastMessage).toHaveBeenCalledTimes(1);
   });
 
   it('handles "position" value as a string', async () => {
     const POSITION = 15;
-    const config = getCrew({
+    const crew = getCrew({
       readLastMessage: jest
         .fn()
         .mockReturnValue({ data: { position: POSITION.toString() } }),
     });
-    const streamName = 'subscriberPosition-123';
+    const options = {} as FinalOptions;
+    const state = getState();
 
-    const result = await getPosition(config, streamName);
+    const result = await getPosition(crew, options, state);
     expect(result).toEqual(POSITION);
   });
 
   it('handles "position" value as a number', async () => {
     const POSITION = 87;
-    const config = getCrew({
+    const crew = getCrew({
       readLastMessage: jest
         .fn()
         .mockReturnValue({ data: { position: POSITION } }),
     });
-    const streamName = 'subscriberPosition-123';
+    const options = {} as FinalOptions;
+    const state = getState();
 
-    const result = await getPosition(config, streamName);
+    const result = await getPosition(crew, options, state);
     expect(result).toEqual(POSITION);
   });
 
   it('handles "position" value is missing', async () => {
-    const config = getCrew({
+    const crew = getCrew({
       readLastMessage: jest
         .fn()
         .mockReturnValue({ data: { otherThing: 'Two' } }),
     });
-    const streamName = 'subscriberPosition-123';
+    const options = {} as FinalOptions;
+    const state = getState();
 
-    const result = await getPosition(config, streamName);
+    const result = await getPosition(crew, options, state);
     expect(result).toEqual(0);
   });
 });
