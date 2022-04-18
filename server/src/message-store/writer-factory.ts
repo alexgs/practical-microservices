@@ -8,14 +8,7 @@ import { QueryResult } from 'pg';
 import { DatabaseWriter } from '../../lib';
 
 import { EventInput, JsonB } from './index';
-
-export type WriteFn = (
-  streamName: string,
-  message: EventInput,
-  expectedVersion?: number | null,
-) => WriteResult;
-
-export type WriteResult = Promise<QueryResult<{write_message: number}>>;
+import { WriteFn } from './types';
 
 type WriteValues = [string, string, string, JsonB, JsonB | null, number | null];
 

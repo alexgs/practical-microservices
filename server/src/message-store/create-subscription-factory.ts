@@ -8,8 +8,7 @@ import { logger, sleep } from '../../lib';
 import { Startable } from '../types';
 
 import { EventInput, WinterfellEvent } from './index';
-import { Reader } from './reader-factory';
-import { WriteFn, WriteResult } from './writer-factory';
+import { Reader, WriteFn, WriteResult } from './types';
 
 export type CreateSubscriptionFn = ReturnType<typeof createSubscriptionFactory>;
 

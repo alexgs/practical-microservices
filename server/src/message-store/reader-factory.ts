@@ -4,16 +4,8 @@
 
 import { PgClient } from '../../lib';
 
-import { ALL_EVENTS_STREAM, WinterfellEvent, isEntityStream } from './index';
-
-export interface Reader {
-  read: (
-    streamName: string,
-    fromPosition?: number,
-    maxMessages?: number,
-  ) => Promise<WinterfellEvent[]>;
-  readLastMessage: (streamName: string) => Promise<WinterfellEvent | null>;
-}
+import { ALL_EVENTS_STREAM, isEntityStream } from './index';
+import { WinterfellEvent, Reader } from './types';
 
 /** @internal */
 export const SQL = {
