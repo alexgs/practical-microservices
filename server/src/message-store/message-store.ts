@@ -8,7 +8,7 @@ import { MessageDatabase } from '../../lib';
 import {
   createSubscriptionFactory,
   CreateSubscriptionFn,
-} from './new-subscription-factory';
+} from './subscription-factory';
 import { readerFactory } from './reader-factory';
 import { Reader, WriteFn } from './types';
 import { writerFactory } from './writer-factory';
