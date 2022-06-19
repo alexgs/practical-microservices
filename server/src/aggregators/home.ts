@@ -45,8 +45,8 @@ function createQueries(db: ViewDatabase) {
           data = jsonb_set(
             jsonb_set(
               data,
-              '{videosViewed}',
-              ((data ->> 'videosViewed')::int + 1)::text::jsonb
+              '{videosWatched}',
+              ((data ->> 'videosWatched')::int + 1)::text::jsonb
             ),
             '{lastViewProcessed}',
             ${event.global_position}::text::jsonb
@@ -63,11 +63,11 @@ function createQueries(db: ViewDatabase) {
 export function createAggregator(config: Config): Aggregator {
   const queries = createQueries(config.viewDb);
   const handlers = createMessageHandlers(queries);
-  // const subscription = messageStore.createSubscription({
-  //   streamName: 'viewing',
-  //   handlers,
-  //   subscriberId: 'aggregators:home-page',
-  // });
+  const subscription = config.messageStore.createSubscription({
+    streamName: 'viewing',
+    handlers,
+    subscriberId: 'aggregators:home-page',
+  });
 
   async function init() {
     return queries.createHomePage();
@@ -75,7 +75,7 @@ export function createAggregator(config: Config): Aggregator {
 
   async function start() {
     await init();
-    // await subscription.start();
+    await subscription.start();
   }
 
   return {
