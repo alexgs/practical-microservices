@@ -83,6 +83,7 @@ export function createSubscriptionFactory(crew: FactoryCrew) {
 
     async function start(): Promise<void> {
       console.log(`Started ${finalOptions.subscriberId}`);
+      // TODO+++ This whole process seems to be broken, but the only sign of failure is that the webpage won't load -- no error messages
       return poll();
     }
 

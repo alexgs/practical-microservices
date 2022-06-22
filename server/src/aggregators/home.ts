@@ -75,7 +75,7 @@ export function createAggregator(config: Config): Aggregator {
 
   async function start() {
     await init();
-    await subscription.start();
+    // await subscription.start();
   }
 
   return {
