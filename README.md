@@ -1,4 +1,4 @@
-# Winterfell
+# Practical Microservices
 
 This repository contains implementation(s) of the architecture and patterns described in [_Practical Microservices: Build Event-Driven Architectures with Event Sourcing and CQRS_][1] by Ethan Garofolo (Pragmatic Bookshelf, 2020). The code in this repository is an original expression of the ideas in this book.
 
